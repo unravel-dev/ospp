@@ -16,11 +16,11 @@ namespace
 inline auto from_impl(const SDL_DisplayMode& mode) -> ::os::display::mode
 {
 	::os::display::mode result;
-	result.w = static_cast<uint32_t>(mode.screen_w);
-	result.h = static_cast<uint32_t>(mode.screen_h);
+	result.w = static_cast<uint32_t>(mode.w);
+	result.h = static_cast<uint32_t>(mode.h);
 	result.refresh_rate = static_cast<uint32_t>(mode.refresh_rate);
 	result.bpp = SDL_BITSPERPIXEL(mode.format);
-	result.display_scale = mode.display_scale;
+	result.display_scale = mode.pixel_density;
 	return result;
 }
 
@@ -120,7 +120,7 @@ inline auto get_display_bounds(int index = 0) -> ::os::display::bounds
     auto display_id = to_display_id(index);
 
 	SDL_Rect rect{};
-	if(SDL_GetDisplayBounds(display_id, &rect) == 0)
+	if(SDL_GetDisplayBounds(display_id, &rect))
 	{
 		return {rect.x, rect.y, static_cast<uint32_t>(rect.w), static_cast<uint32_t>(rect.h)};
 	}
@@ -133,7 +133,7 @@ inline auto get_display_usable_bounds(int index = 0) -> ::os::display::bounds
 	auto display_id = to_display_id(index);
 
 	SDL_Rect rect{};
-	if(SDL_GetDisplayUsableBounds(display_id, &rect) == 0)
+	if(SDL_GetDisplayUsableBounds(display_id, &rect))
 	{
 		return {rect.x, rect.y, static_cast<uint32_t>(rect.w), static_cast<uint32_t>(rect.h)};
 	}

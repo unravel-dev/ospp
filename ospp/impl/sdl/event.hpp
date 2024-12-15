@@ -80,35 +80,35 @@ inline auto to_event(const SDL_Event& e) -> event
 		case SDL_EVENT_DISPLAY_ORIENTATION:
 			ev.type = events::display_orientation;
 			break;
-		case SDL_EVENT_DISPLAY_CONNECTED:
+		case SDL_EVENT_DISPLAY_ADDED:
 			ev.type = events::display_connected;
 			break;
-		case SDL_EVENT_DISPLAY_DISCONNECTED:
+		case SDL_EVENT_DISPLAY_REMOVED:
 			ev.type = events::display_disconnected;
 			break;
 		case SDL_EVENT_DISPLAY_MOVED:
 			ev.type = events::display_moved;
 			break;
-		case SDL_EVENT_DISPLAY_SCALE_CHANGED:
+		case SDL_EVENT_DISPLAY_CONTENT_SCALE_CHANGED:
 			ev.type = events::display_content_scale_changed;
 			break;
 		case SDL_EVENT_KEY_DOWN:
 			ev.type = events::key_down;
 			ev.key.window_id = e.key.windowID;
-			ev.key.code = detail::sdl::from_layout_independent_impl(e.key.keysym.scancode);
-			ev.key.alt = (e.key.keysym.mod & SDL_KMOD_ALT) != 0;
-			ev.key.ctrl = (e.key.keysym.mod & SDL_KMOD_CTRL) != 0;
-			ev.key.shift = (e.key.keysym.mod & SDL_KMOD_SHIFT) != 0;
-			ev.key.system = (e.key.keysym.mod & SDL_KMOD_GUI) != 0;
+			ev.key.code = detail::sdl::from_layout_independent_impl(e.key.scancode);
+			ev.key.alt = (e.key.mod & SDL_KMOD_ALT) != 0;
+			ev.key.ctrl = (e.key.mod & SDL_KMOD_CTRL) != 0;
+			ev.key.shift = (e.key.mod & SDL_KMOD_SHIFT) != 0;
+			ev.key.system = (e.key.mod & SDL_KMOD_GUI) != 0;
 			break;
 		case SDL_EVENT_KEY_UP:
 			ev.type = events::key_up;
 			ev.key.window_id = e.key.windowID;
-			ev.key.code = detail::sdl::from_layout_independent_impl(e.key.keysym.scancode);
-			ev.key.alt = (e.key.keysym.mod & SDL_KMOD_ALT) != 0;
-			ev.key.ctrl = (e.key.keysym.mod & SDL_KMOD_CTRL) != 0;
-			ev.key.shift = (e.key.keysym.mod & SDL_KMOD_SHIFT) != 0;
-			ev.key.system = (e.key.keysym.mod & SDL_KMOD_GUI) != 0;
+			ev.key.code = detail::sdl::from_layout_independent_impl(e.key.scancode);
+			ev.key.alt = (e.key.mod & SDL_KMOD_ALT) != 0;
+			ev.key.ctrl = (e.key.mod & SDL_KMOD_CTRL) != 0;
+			ev.key.shift = (e.key.mod & SDL_KMOD_SHIFT) != 0;
+			ev.key.system = (e.key.mod & SDL_KMOD_GUI) != 0;
 			break;
 		case SDL_EVENT_TEXT_INPUT:
 			ev.type = events::text_input;
@@ -142,7 +142,7 @@ inline auto to_event(const SDL_Event& e) -> event
 			ev.motion.x = int32_t(e.motion.x);
 			ev.motion.y = int32_t(e.motion.y);
 
-			if (SDL_GetRelativeMouseMode())
+			if (SDL_GetWindowRelativeMouseMode(SDL_GetWindowFromID(e.motion.windowID)))
 			{
 				auto& pos = mouse::detail::sdl::mouse_pos_while_relative();
 				pos.x += e.motion.xrel;
@@ -189,10 +189,9 @@ inline auto to_event(const SDL_Event& e) -> event
 			ev.drop.window_id = e.drop.windowID;
             ev.drop.x = e.drop.x;
             ev.drop.y = e.drop.y;
-			if(e.drop.file != nullptr)
+			if(e.drop.data != nullptr)
 			{
-				ev.drop.data = e.drop.file;
-				SDL_free(e.drop.file);
+				ev.drop.data = e.drop.data;
 			}
 			break;
 		default:

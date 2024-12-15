@@ -1,7 +1,7 @@
 #pragma once
 
-#include <string>
 #include <cstdint>
+#include <string>
 
 namespace os
 {
@@ -223,16 +223,24 @@ enum code : int32_t
 	ralt,
 	rgui,
 	mode,
-	audionext,
-	audioprev,
-	audiostop,
-	audioplay,
-	audiomute,
-	mediaselect,
-	www,
-	mail,
-	calculator,
-	computer,
+	media_play,
+	media_pause,
+	media_record,
+	media_fast_forward,
+	media_rewind,
+	media_next,
+	media_prev,
+	media_stop,
+	media_eject,
+	media_play_pause,
+	media_select,
+	ac_new,
+	ac_open,
+	ac_close,
+	ac_exit,
+	ac_save,
+	ac_print,
+	ac_propertiues,
 	ac_search,
 	ac_home,
 	ac_back,
@@ -240,18 +248,7 @@ enum code : int32_t
 	ac_stop,
 	ac_refresh,
 	ac_bookmarks,
-	brightnessdown,
-	brightnessup,
-	displayswitch,
-	kbdillumtoggle,
-	kbdillumdown,
-	kbdillumup,
-	eject,
 	sleep,
-	app1,
-	app2,
-	audiorewind,
-	audiofastforward,
 	count
 };
 

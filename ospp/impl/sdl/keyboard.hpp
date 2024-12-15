@@ -21,12 +21,15 @@ struct mappings
 
 		for(const auto& kvp : map)
 		{
-			auto it = impl_scancode_to_os.find(kvp.second);
+			auto scancode = kvp.second;
+			auto it = impl_scancode_to_os.find(scancode);
 			if(it != std::end(impl_scancode_to_os))
 			{
+				auto name = SDL_GetScancodeName(kvp.second);
+				(void)name;
 				assert(false && "scancode already added");
 			}
-			impl_scancode_to_os[kvp.second] = kvp.first;
+			impl_scancode_to_os[scancode] = kvp.first;
 
 			//            auto name = SDL_GetScancodeName(kvp.second);
 			//            string_to_key_code[name] = kvp.first;
@@ -79,11 +82,13 @@ mappings key_map = []()
 		{key::digit8, SDL_SCANCODE_8},
 		{key::digit9, SDL_SCANCODE_9},
 		{key::digit0, SDL_SCANCODE_0},
+
 		{key::enter, SDL_SCANCODE_RETURN},
 		{key::escape, SDL_SCANCODE_ESCAPE},
 		{key::backspace, SDL_SCANCODE_BACKSPACE},
 		{key::tab, SDL_SCANCODE_TAB},
 		{key::space, SDL_SCANCODE_SPACE},
+
 		{key::minus, SDL_SCANCODE_MINUS},
 		{key::equals, SDL_SCANCODE_EQUALS},
 		{key::leftbracket, SDL_SCANCODE_LEFTBRACKET},
@@ -96,7 +101,9 @@ mappings key_map = []()
 		{key::comma, SDL_SCANCODE_COMMA},
 		{key::period, SDL_SCANCODE_PERIOD},
 		{key::slash, SDL_SCANCODE_SLASH},
+
 		{key::capslock, SDL_SCANCODE_CAPSLOCK},
+
 		{key::f1, SDL_SCANCODE_F1},
 		{key::f2, SDL_SCANCODE_F2},
 		{key::f3, SDL_SCANCODE_F3},
@@ -109,6 +116,7 @@ mappings key_map = []()
 		{key::f10, SDL_SCANCODE_F10},
 		{key::f11, SDL_SCANCODE_F11},
 		{key::f12, SDL_SCANCODE_F12},
+
 		{key::printscreen, SDL_SCANCODE_PRINTSCREEN},
 		{key::scrolllock, SDL_SCANCODE_SCROLLLOCK},
 		{key::pause, SDL_SCANCODE_PAUSE},
@@ -122,7 +130,9 @@ mappings key_map = []()
 		{key::left, SDL_SCANCODE_LEFT},
 		{key::down, SDL_SCANCODE_DOWN},
 		{key::up, SDL_SCANCODE_UP},
+
 		{key::numlockclear, SDL_SCANCODE_NUMLOCKCLEAR},
+
 		{key::kp_divide, SDL_SCANCODE_KP_DIVIDE},
 		{key::kp_multiply, SDL_SCANCODE_KP_MULTIPLY},
 		{key::kp_minus, SDL_SCANCODE_KP_MINUS},
@@ -139,6 +149,7 @@ mappings key_map = []()
 		{key::kp_digit9, SDL_SCANCODE_KP_8},
 		{key::kp_digit0, SDL_SCANCODE_KP_9},
 		{key::kp_period, SDL_SCANCODE_KP_PERIOD},
+
 		{key::nonusbackslash, SDL_SCANCODE_NONUSBACKSLASH},
 		{key::application, SDL_SCANCODE_APPLICATION},
 		{key::power, SDL_SCANCODE_POWER},
@@ -189,6 +200,7 @@ mappings key_map = []()
 		{key::lang7, SDL_SCANCODE_LANG7},
 		{key::lang8, SDL_SCANCODE_LANG8},
 		{key::lang9, SDL_SCANCODE_LANG9},
+
 		{key::alterase, SDL_SCANCODE_ALTERASE},
 		{key::sysreq, SDL_SCANCODE_SYSREQ},
 		{key::cancel, SDL_SCANCODE_CANCEL},
@@ -256,16 +268,24 @@ mappings key_map = []()
 		{key::ralt, SDL_SCANCODE_RALT},
 		{key::rgui, SDL_SCANCODE_RGUI},
 		{key::mode, SDL_SCANCODE_MODE},
-		{key::audionext, SDL_SCANCODE_AUDIONEXT},
-		{key::audioprev, SDL_SCANCODE_AUDIOPREV},
-		{key::audiostop, SDL_SCANCODE_AUDIOSTOP},
-		{key::audioplay, SDL_SCANCODE_AUDIOPLAY},
-		{key::audiomute, SDL_SCANCODE_AUDIOMUTE},
-		{key::mediaselect, SDL_SCANCODE_MEDIASELECT},
-		{key::www, SDL_SCANCODE_WWW},
-		{key::mail, SDL_SCANCODE_MAIL},
-		{key::calculator, SDL_SCANCODE_CALCULATOR},
-		{key::computer, SDL_SCANCODE_COMPUTER},
+		{key::media_play, SDL_SCANCODE_MEDIA_PLAY},
+		{key::media_pause, SDL_SCANCODE_MEDIA_PAUSE},
+		{key::media_record, SDL_SCANCODE_MEDIA_RECORD},
+		{key::media_fast_forward, SDL_SCANCODE_MEDIA_FAST_FORWARD},
+		{key::media_rewind, SDL_SCANCODE_MEDIA_REWIND},
+		{key::media_next, SDL_SCANCODE_MEDIA_NEXT_TRACK},
+		{key::media_prev, SDL_SCANCODE_MEDIA_PREVIOUS_TRACK},
+		{key::media_stop, SDL_SCANCODE_MEDIA_STOP},
+		{key::media_eject, SDL_SCANCODE_MEDIA_EJECT},
+		{key::media_play_pause, SDL_SCANCODE_MEDIA_PLAY_PAUSE},
+		{key::media_select, SDL_SCANCODE_MEDIA_SELECT},
+		{key::ac_new, SDL_SCANCODE_AC_NEW},
+		{key::ac_open, SDL_SCANCODE_AC_OPEN},
+		{key::ac_close, SDL_SCANCODE_AC_CLOSE},
+		{key::ac_exit, SDL_SCANCODE_AC_EXIT},
+		{key::ac_save, SDL_SCANCODE_AC_SAVE},
+		{key::ac_print, SDL_SCANCODE_AC_PRINT},
+		{key::ac_propertiues, SDL_SCANCODE_AC_PROPERTIES},
 		{key::ac_search, SDL_SCANCODE_AC_SEARCH},
 		{key::ac_home, SDL_SCANCODE_AC_HOME},
 		{key::ac_back, SDL_SCANCODE_AC_BACK},
@@ -273,18 +293,7 @@ mappings key_map = []()
 		{key::ac_stop, SDL_SCANCODE_AC_STOP},
 		{key::ac_refresh, SDL_SCANCODE_AC_REFRESH},
 		{key::ac_bookmarks, SDL_SCANCODE_AC_BOOKMARKS},
-		{key::brightnessdown, SDL_SCANCODE_BRIGHTNESSDOWN},
-		{key::brightnessup, SDL_SCANCODE_BRIGHTNESSUP},
-		{key::displayswitch, SDL_SCANCODE_DISPLAYSWITCH},
-		{key::kbdillumtoggle, SDL_SCANCODE_KBDILLUMTOGGLE},
-		{key::kbdillumdown, SDL_SCANCODE_KBDILLUMDOWN},
-		{key::kbdillumup, SDL_SCANCODE_KBDILLUMUP},
-		{key::eject, SDL_SCANCODE_EJECT},
 		{key::sleep, SDL_SCANCODE_SLEEP},
-		{key::app1, SDL_SCANCODE_APP1},
-		{key::app2, SDL_SCANCODE_APP2},
-		{key::audiorewind, SDL_SCANCODE_AUDIOREWIND},
-		{key::audiofastforward, SDL_SCANCODE_AUDIOFASTFORWARD},
 	});
 	return m;
 }();
@@ -339,22 +348,22 @@ inline auto is_pressed(os::key::code key_code) noexcept -> bool
 
 inline auto has_screen_keyboard() noexcept -> bool
 {
-	return SDL_HasScreenKeyboardSupport() == SDL_TRUE;
+	return SDL_HasScreenKeyboardSupport();
 }
 
 inline void start_text_input() noexcept
 {
-	SDL_StartTextInput();
+	//SDL_StartTextInput();
 }
 
 inline void stop_text_input() noexcept
 {
-	SDL_StopTextInput();
+	// SDL_StopTextInput();
 }
 
 inline auto is_text_input_active() noexcept -> bool
 {
-	return SDL_TextInputActive() == SDL_TRUE;
+	return false;//SDL_TextInputActive() == SDL_TRUE;
 }
 } // namespace sdl
 } // namespace detail

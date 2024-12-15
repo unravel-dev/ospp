@@ -57,7 +57,7 @@ inline auto to_impl(button b) -> uint8_t
 inline auto is_button_pressed(button b) noexcept -> bool
 {
 	auto impl_button = to_impl(b);
-	return (SDL_GetGlobalMouseState(nullptr, nullptr) & SDL_BUTTON(impl_button)) != 0;
+	return (SDL_GetGlobalMouseState(nullptr, nullptr) & SDL_BUTTON_MASK(impl_button)) != 0;
 }
 
 inline auto get_position() noexcept -> point
@@ -116,7 +116,7 @@ inline auto mouse_pos_on_relative_start() -> point&
 
 inline void capture(bool enabled) noexcept
 {
-	SDL_CaptureMouse(enabled ? SDL_TRUE : SDL_FALSE);
+	SDL_CaptureMouse(enabled);
 }
 
 inline void disable(bool val) noexcept
@@ -127,9 +127,9 @@ inline void disable(bool val) noexcept
 	if (window)
 	{
 		// Grab the input, confining the cursor to the window
-		SDL_SetWindowGrab(window, val ? SDL_TRUE : SDL_FALSE);
+		SDL_SetWindowMouseGrab(window, val);
 
-		static bool relative = SDL_GetRelativeMouseMode();
+		static bool relative = SDL_GetWindowRelativeMouseMode(window);
 
 		bool is_different = relative != val;
 
@@ -149,7 +149,7 @@ inline void disable(bool val) noexcept
 	}
 
 	// Set relative mouse mode
-	SDL_SetRelativeMouseMode(val ? SDL_TRUE : SDL_FALSE);
+	SDL_SetWindowRelativeMouseMode(window, val);
 }
 
 

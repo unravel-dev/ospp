@@ -83,49 +83,97 @@ inline auto to_cursor_impl(const cursor& c) -> const cursor_impl&
 	return *reinterpret_cast<cursor_impl*>(c.get_impl());
 }
 
-inline auto get_native_window_handle(const SDL_SysWMinfo& wmi) noexcept -> native_handle
+inline auto get_native_window_handle(SDL_Window* window) noexcept -> native_handle
 {
-	(void)wmi;
-#if defined(SDL_ENABLE_SYSWM_WINDOWS)
-	return wmi.info.win.window;
-#elif defined(SDL_ENABLE_SYSWM_WINRT)
-	return wmi.info.winrt.window;
-#elif defined(SDL_ENABLE_SYSWM_X11)
-	return (void*)(uintptr_t)wmi.info.x11.window;
-#elif defined(SDL_ENABLE_SYSWM_COCOA)
-	return wmi.info.cocoa.window;
-#elif defined(SDL_ENABLE_SYSWM_UIKIT)
-	return wmi.info.uikit.window;
-#elif defined(SDL_ENABLE_SYSWM_WAYLAND)
-	return wmi.info.wl.surface;
-#elif defined(SDL_ENABLE_SYSWM_ANDROID)
-	return wmi.info.android.window;
-#elif defined(SDL_ENABLE_SYSWM_VIVANTE)
-	return (void*)(uintptr_t)wmi.info.vivante.window;
+	// 	// (void)wmi;
+	// #if defined(SDL_ENABLE_SYSWM_WINDOWS)
+	// 	return wmi.info.win.window;
+	// #elif defined(SDL_ENABLE_SYSWM_WINRT)
+	// 	return wmi.info.winrt.window;
+	// #elif defined(SDL_ENABLE_SYSWM_X11)
+	// 	return (void*)(uintptr_t)wmi.info.x11.window;
+	// #elif defined(SDL_ENABLE_SYSWM_COCOA)
+	// 	return wmi.info.cocoa.window;
+	// #elif defined(SDL_ENABLE_SYSWM_UIKIT)
+	// 	return wmi.info.uikit.window;
+	// #elif defined(SDL_ENABLE_SYSWM_WAYLAND)
+	// 	return wmi.info.wl.surface;
+	// #elif defined(SDL_ENABLE_SYSWM_ANDROID)
+	// 	return wmi.info.android.window;
+	// #elif defined(SDL_ENABLE_SYSWM_VIVANTE)
+	// 	return (void*)(uintptr_t)wmi.info.vivante.window;
+	// #else
+	// 	return nullptr;
+	// #endif
+
+#if defined(SDL_PLATFORM_WIN32)
+	return SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_WIN32_HWND_POINTER, NULL);
+#elif defined(SDL_PLATFORM_MACOS)
+	return SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_COCOA_WINDOW_POINTER,
+								  NULL);
+#elif defined(SDL_PLATFORM_LINUX)
+	if(SDL_strcmp(SDL_GetCurrentVideoDriver(), "x11") == 0)
+	{
+		// Display *xdisplay = (Display *)SDL_GetPointerProperty(SDL_GetWindowProperties(window),
+		// SDL_PROP_WINDOW_X11_DISPLAY_POINTER, NULL);
+		return SDL_GetNumberProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_X11_WINDOW_NUMBER, 0);
+	}
+	else if(SDL_strcmp(SDL_GetCurrentVideoDriver(), "wayland") == 0)
+	{
+		// struct wl_display *display = (struct wl_display
+		// *)SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_WAYLAND_DISPLAY_POINTER,
+		// NULL);
+		return SDL_GetPointerProperty(SDL_GetWindowProperties(window),
+									  SDL_PROP_WINDOW_WAYLAND_SURFACE_POINTER, NULL);
+	}
+#elif defined(SDL_PLATFORM_IOS)
+	SDL_PropertiesID props = SDL_GetWindowProperties(window);
+	return SDL_GetPointerProperty(props, SDL_PROP_WINDOW_UIKIT_WINDOW_POINTER, NULL);
 #else
 	return nullptr;
 #endif
 }
 
-inline auto get_native_display_handle(const SDL_SysWMinfo& wmi) noexcept -> native_display
+inline auto get_native_display_handle(SDL_Window* window) noexcept -> native_display
 {
-	(void)wmi;
-#if defined(SDL_ENABLE_SYSWM_WINDOWS)
-	return wmi.info.win.hdc;
-#elif defined(SDL_ENABLE_SYSWM_WINRT)
+	// 	(void)wmi;
+	// #if defined(SDL_ENABLE_SYSWM_WINDOWS)
+	// 	return wmi.info.win.hdc;
+	// #elif defined(SDL_ENABLE_SYSWM_WINRT)
+	// 	return nullptr;
+	// #elif defined(SDL_ENABLE_SYSWM_X11)
+	// 	return wmi.info.x11.display;
+	// #elif defined(SDL_ENABLE_SYSWM_COCOA)
+	// 	return nullptr;
+	// #elif defined(SDL_ENABLE_SYSWM_UIKIT)
+	// 	return nullptr;
+	// #elif defined(SDL_ENABLE_SYSWM_WAYLAND)
+	// 	return wmi.info.wl.display;
+	// #elif defined(SDL_ENABLE_SYSWM_ANDROID)
+	// 	return nullptr;
+	// #elif defined(SDL_ENABLE_SYSWM_VIVANTE)
+	// 	return (void*)(uintptr_t)wmi.info.vivante.display;
+	// #else
+	// 	return nullptr;
+	// #endif
+
+#if defined(SDL_PLATFORM_WIN32)
+	return SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_WIN32_HDC_POINTER, NULL);
+#elif defined(SDL_PLATFORM_MACOS)
+	return nullptr
+#elif defined(SDL_PLATFORM_LINUX)
+	if(SDL_strcmp(SDL_GetCurrentVideoDriver(), "x11") == 0)
+	{
+		return SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_X11_DISPLAY_POINTER,
+									  NULL);
+	}
+	else if(SDL_strcmp(SDL_GetCurrentVideoDriver(), "wayland") == 0)
+	{
+		return SDL_GetPointerProperty(SDL_GetWindowProperties(window),
+									  SDL_PROP_WINDOW_WAYLAND_DISPLAY_POINTER, NULL);
+	}
+#elif defined(SDL_PLATFORM_IOS)
 	return nullptr;
-#elif defined(SDL_ENABLE_SYSWM_X11)
-	return wmi.info.x11.display;
-#elif defined(SDL_ENABLE_SYSWM_COCOA)
-	return nullptr;
-#elif defined(SDL_ENABLE_SYSWM_UIKIT)
-	return nullptr;
-#elif defined(SDL_ENABLE_SYSWM_WAYLAND)
-	return wmi.info.wl.display;
-#elif defined(SDL_ENABLE_SYSWM_ANDROID)
-	return nullptr;
-#elif defined(SDL_ENABLE_SYSWM_VIVANTE)
-	return (void*)(uintptr_t)wmi.info.vivante.display;
 #else
 	return nullptr;
 #endif
@@ -163,11 +211,11 @@ inline auto get_impl_flags(uint32_t flags) -> uint32_t
 		result |= SDL_WINDOW_MAXIMIZED;
 	}
 
-// #if defined(SDL_ENABLE_SYSWM_WINDOWS)
-// 	// due to sdl's current lack of dpi awarenes on windows
-// 	// we have to implement it ourselves
-// 	set_process_dpi_aware();
-// #endif
+	// #if defined(SDL_ENABLE_SYSWM_WINDOWS)
+	// 	// due to sdl's current lack of dpi awarenes on windows
+	// 	// we have to implement it ourselves
+	// 	set_process_dpi_aware();
+	// #endif
 
 	return result;
 }
@@ -205,22 +253,11 @@ public:
 
 	auto get_native_handle() const -> native_handle
 	{
-		SDL_SysWMinfo wmi;
-		if(SDL_GetWindowWMInfo(impl_.get(), &wmi, SDL_SYSWM_CURRENT_VERSION) != 0)
-		{
-			OS_SDL_ERROR_HANDLER({});
-		}
-
-		return get_native_window_handle(wmi);
+		return get_native_window_handle(impl_.get());
 	}
 	auto get_native_display() const -> native_display
 	{
-		SDL_SysWMinfo wmi;
-		if(SDL_GetWindowWMInfo(impl_.get(), &wmi, SDL_SYSWM_CURRENT_VERSION) != 0)
-		{
-			OS_SDL_ERROR_HANDLER({});
-		}
-		return get_native_display_handle(wmi);
+		return get_native_display_handle(impl_.get());
 	}
 
 	auto is_open() const noexcept -> bool
@@ -354,12 +391,15 @@ public:
 
 	void set_border(bool b) noexcept
 	{
-		SDL_SetWindowBordered(impl_.get(), b ? SDL_TRUE : SDL_FALSE);
+		if(!SDL_SetWindowBordered(impl_.get(), b))
+		{
+			OS_SDL_ERROR_HANDLER_VOID();
+		}
 	}
 
 	void set_fullscreen(bool b)
 	{
-		if(SDL_SetWindowFullscreen(impl_.get(), b ? SDL_TRUE : SDL_FALSE) != 0)
+		if(!SDL_SetWindowFullscreen(impl_.get(), b))
 		{
 			OS_SDL_ERROR_HANDLER_VOID();
 		}
@@ -367,7 +407,7 @@ public:
 
 	void set_opacity(float opacity)
 	{
-		if(SDL_SetWindowOpacity(impl_.get(), opacity) != 0)
+		if(!SDL_SetWindowOpacity(impl_.get(), opacity))
 		{
 			OS_SDL_ERROR_HANDLER_VOID();
 		}
@@ -375,28 +415,23 @@ public:
 
 	auto get_opacity() const -> float
 	{
-		float opacity{1.0f};
-		if(SDL_GetWindowOpacity(impl_.get(), &opacity) != 0)
-		{
-			OS_SDL_ERROR_HANDLER(opacity);
-		}
-
-		return opacity;
+		return SDL_GetWindowOpacity(impl_.get());
 	}
 
 	void grab_input(bool b) noexcept
 	{
-		SDL_SetWindowGrab(impl_.get(), b ? SDL_TRUE : SDL_FALSE);
+		SDL_SetWindowMouseGrab(impl_.get(), b);
+		// SDL_SetWindowKeyboardGrab(impl_.get(), b);
 	}
 
 	auto is_input_grabbed() const noexcept -> bool
 	{
-		return SDL_GetWindowGrab(impl_.get()) != SDL_FALSE;
+		return SDL_GetWindowMouseGrab(impl_.get());
 	}
 
 	void request_focus()
 	{
-		if(SDL_RaiseWindow(impl_.get()) != 0)
+		if(!SDL_RaiseWindow(impl_.get()))
 		{
 			OS_SDL_ERROR_HANDLER_VOID();
 		}
@@ -428,8 +463,8 @@ public:
 	void set_icon(const image& img)
 	{
 		auto surface =
-			SDL_CreateSurfaceFrom((void*)img.pixels.data(), int(img.size.w), int(img.size.h),
-								  int(img.size.w * 4), SDL_PixelFormatEnum::SDL_PIXELFORMAT_RGBA8888);
+			SDL_CreateSurfaceFrom(int(img.size.w), int(img.size.h), SDL_PixelFormat::SDL_PIXELFORMAT_RGBA8888,
+								  (void*)img.pixels.data(), int(img.size.w * 4));
 		if(!surface)
 		{
 			OS_SDL_ERROR_HANDLER_VOID();
