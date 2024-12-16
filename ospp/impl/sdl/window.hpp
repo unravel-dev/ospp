@@ -85,26 +85,6 @@ inline auto to_cursor_impl(const cursor& c) -> const cursor_impl&
 
 inline auto get_native_window_handle(SDL_Window* window) noexcept -> native_handle
 {
-	// 	// (void)wmi;
-	// #if defined(SDL_ENABLE_SYSWM_WINDOWS)
-	// 	return wmi.info.win.window;
-	// #elif defined(SDL_ENABLE_SYSWM_WINRT)
-	// 	return wmi.info.winrt.window;
-	// #elif defined(SDL_ENABLE_SYSWM_X11)
-	// 	return (void*)(uintptr_t)wmi.info.x11.window;
-	// #elif defined(SDL_ENABLE_SYSWM_COCOA)
-	// 	return wmi.info.cocoa.window;
-	// #elif defined(SDL_ENABLE_SYSWM_UIKIT)
-	// 	return wmi.info.uikit.window;
-	// #elif defined(SDL_ENABLE_SYSWM_WAYLAND)
-	// 	return wmi.info.wl.surface;
-	// #elif defined(SDL_ENABLE_SYSWM_ANDROID)
-	// 	return wmi.info.android.window;
-	// #elif defined(SDL_ENABLE_SYSWM_VIVANTE)
-	// 	return (void*)(uintptr_t)wmi.info.vivante.window;
-	// #else
-	// 	return nullptr;
-	// #endif
 
 #if defined(SDL_PLATFORM_WIN32)
 	return SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_WIN32_HWND_POINTER, NULL);
@@ -114,17 +94,16 @@ inline auto get_native_window_handle(SDL_Window* window) noexcept -> native_hand
 #elif defined(SDL_PLATFORM_LINUX)
 	if(SDL_strcmp(SDL_GetCurrentVideoDriver(), "x11") == 0)
 	{
-		// Display *xdisplay = (Display *)SDL_GetPointerProperty(SDL_GetWindowProperties(window),
-		// SDL_PROP_WINDOW_X11_DISPLAY_POINTER, NULL);
-		return SDL_GetNumberProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_X11_WINDOW_NUMBER, 0);
+		return (void*)(uintptr_t)SDL_GetNumberProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_X11_WINDOW_NUMBER, 0);
 	}
 	else if(SDL_strcmp(SDL_GetCurrentVideoDriver(), "wayland") == 0)
 	{
-		// struct wl_display *display = (struct wl_display
-		// *)SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_WAYLAND_DISPLAY_POINTER,
-		// NULL);
 		return SDL_GetPointerProperty(SDL_GetWindowProperties(window),
 									  SDL_PROP_WINDOW_WAYLAND_SURFACE_POINTER, NULL);
+	}
+	else
+	{
+		return nullptr;
 	}
 #elif defined(SDL_PLATFORM_IOS)
 	SDL_PropertiesID props = SDL_GetWindowProperties(window);
@@ -136,31 +115,11 @@ inline auto get_native_window_handle(SDL_Window* window) noexcept -> native_hand
 
 inline auto get_native_display_handle(SDL_Window* window) noexcept -> native_display
 {
-	// 	(void)wmi;
-	// #if defined(SDL_ENABLE_SYSWM_WINDOWS)
-	// 	return wmi.info.win.hdc;
-	// #elif defined(SDL_ENABLE_SYSWM_WINRT)
-	// 	return nullptr;
-	// #elif defined(SDL_ENABLE_SYSWM_X11)
-	// 	return wmi.info.x11.display;
-	// #elif defined(SDL_ENABLE_SYSWM_COCOA)
-	// 	return nullptr;
-	// #elif defined(SDL_ENABLE_SYSWM_UIKIT)
-	// 	return nullptr;
-	// #elif defined(SDL_ENABLE_SYSWM_WAYLAND)
-	// 	return wmi.info.wl.display;
-	// #elif defined(SDL_ENABLE_SYSWM_ANDROID)
-	// 	return nullptr;
-	// #elif defined(SDL_ENABLE_SYSWM_VIVANTE)
-	// 	return (void*)(uintptr_t)wmi.info.vivante.display;
-	// #else
-	// 	return nullptr;
-	// #endif
 
 #if defined(SDL_PLATFORM_WIN32)
 	return SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_WIN32_HDC_POINTER, NULL);
 #elif defined(SDL_PLATFORM_MACOS)
-	return nullptr
+	return nullptr;
 #elif defined(SDL_PLATFORM_LINUX)
 	if(SDL_strcmp(SDL_GetCurrentVideoDriver(), "x11") == 0)
 	{
@@ -171,6 +130,10 @@ inline auto get_native_display_handle(SDL_Window* window) noexcept -> native_dis
 	{
 		return SDL_GetPointerProperty(SDL_GetWindowProperties(window),
 									  SDL_PROP_WINDOW_WAYLAND_DISPLAY_POINTER, NULL);
+	}
+	else
+	{
+		return nullptr;
 	}
 #elif defined(SDL_PLATFORM_IOS)
 	return nullptr;
