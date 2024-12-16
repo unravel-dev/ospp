@@ -16,7 +16,7 @@ namespace detail
 namespace sdl
 {
 
-#if defined(SDL_ENABLE_SYSWM_WINDOWS)
+#if defined(SDL_PLATFORM_WIN32)
 namespace
 {
 // void set_process_dpi_aware()
