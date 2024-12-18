@@ -240,7 +240,7 @@ enum code : int32_t
 	ac_exit,
 	ac_save,
 	ac_print,
-	ac_propertiues,
+	ac_properties,
 	ac_search,
 	ac_home,
 	ac_back,

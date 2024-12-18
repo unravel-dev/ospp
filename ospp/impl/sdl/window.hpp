@@ -16,68 +16,6 @@ namespace detail
 namespace sdl
 {
 
-#if defined(SDL_PLATFORM_WIN32)
-namespace
-{
-// void set_process_dpi_aware()
-// {
-
-// 	// Try SetProcessDpiAwareness first
-// 	HINSTANCE shCoreDll = LoadLibraryW(L"Shcore.dll");
-
-// 	if(shCoreDll)
-// 	{
-// 		enum ProcessDpiAwareness
-// 		{
-// 			ProcessDpiUnaware = 0,
-// 			ProcessSystemDpiAware = 1,
-// 			ProcessPerMonitorDpiAware = 2
-// 		};
-
-// 		typedef HRESULT(WINAPI * SetProcessDpiAwarenessFuncType)(ProcessDpiAwareness);
-// 		SetProcessDpiAwarenessFuncType SetProcessDpiAwarenessFunc =
-// 			reinterpret_cast<SetProcessDpiAwarenessFuncType>(
-// 				GetProcAddress(shCoreDll, "SetProcessDpiAwareness"));
-
-// 		if(SetProcessDpiAwarenessFunc)
-// 		{
-// 			// We only check for E_INVALIDARG because we would get
-// 			// E_ACCESSDENIED if the DPI was already set previously
-// 			// and S_OK means the call was successful
-// 			if(SetProcessDpiAwarenessFunc(ProcessSystemDpiAware) == E_INVALIDARG)
-// 			{
-// 			}
-// 			else
-// 			{
-// 				FreeLibrary(shCoreDll);
-// 				return;
-// 			}
-// 		}
-
-// 		FreeLibrary(shCoreDll);
-// 	}
-
-// 	// Fall back to SetProcessDPIAware if SetProcessDpiAwareness
-// 	// is not available on this system
-// 	HINSTANCE user32Dll = LoadLibraryW(L"user32.dll");
-
-// 	if(user32Dll)
-// 	{
-// 		typedef BOOL(WINAPI * SetProcessDPIAwareFuncType)(void);
-// 		SetProcessDPIAwareFuncType SetProcessDPIAwareFunc =
-// 			reinterpret_cast<SetProcessDPIAwareFuncType>(GetProcAddress(user32Dll, "SetProcessDPIAware"));
-
-// 		if(SetProcessDPIAwareFunc)
-// 		{
-// 			SetProcessDPIAwareFunc();
-// 		}
-
-// 		FreeLibrary(user32Dll);
-// 	}
-// }
-} // namespace
-#endif
-
 inline auto to_cursor_impl(const cursor& c) -> const cursor_impl&
 {
 	return *reinterpret_cast<cursor_impl*>(c.get_impl());
@@ -94,7 +32,8 @@ inline auto get_native_window_handle(SDL_Window* window) noexcept -> native_hand
 #elif defined(SDL_PLATFORM_LINUX)
 	if(SDL_strcmp(SDL_GetCurrentVideoDriver(), "x11") == 0)
 	{
-		return (void*)(uintptr_t)SDL_GetNumberProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_X11_WINDOW_NUMBER, 0);
+		return (void*)(uintptr_t)SDL_GetNumberProperty(SDL_GetWindowProperties(window),
+													   SDL_PROP_WINDOW_X11_WINDOW_NUMBER, 0);
 	}
 	else if(SDL_strcmp(SDL_GetCurrentVideoDriver(), "wayland") == 0)
 	{
@@ -144,14 +83,14 @@ inline auto get_native_display_handle(SDL_Window* window) noexcept -> native_dis
 
 inline auto get_impl_flags(uint32_t flags) -> uint32_t
 {
-	uint32_t result = 0x00002000; // SDL_WINDOW_ALLOW_HIGHDPI;
+	uint32_t result = SDL_WINDOW_HIGH_PIXEL_DENSITY;
 	if(flags & window::fullscreen)
 	{
 		result |= SDL_WINDOW_FULLSCREEN;
 	}
 	if(flags & window::fullscreen_desktop)
 	{
-		result |= 0x00001000; // SDL_WINDOW_FULLSCREEN_DESKTOP;
+		result |= SDL_WINDOW_FULLSCREEN;
 	}
 	if(flags & window::hidden)
 	{
@@ -173,12 +112,22 @@ inline auto get_impl_flags(uint32_t flags) -> uint32_t
 	{
 		result |= SDL_WINDOW_MAXIMIZED;
 	}
-
-	// #if defined(SDL_ENABLE_SYSWM_WINDOWS)
-	// 	// due to sdl's current lack of dpi awarenes on windows
-	// 	// we have to implement it ourselves
-	// 	set_process_dpi_aware();
-	// #endif
+	if(flags & window::no_taskbar)
+	{
+		result |= SDL_WINDOW_UTILITY;
+	}
+	if(flags & window::tooltip)
+	{
+		result |= SDL_WINDOW_TOOLTIP;
+	}
+	if(flags & window::popup)
+	{
+		result |= SDL_WINDOW_POPUP_MENU;
+	}
+	if(flags & window::utility)
+	{
+		result |= SDL_WINDOW_UTILITY;
+	}
 
 	return result;
 }
@@ -198,15 +147,28 @@ class window_impl
 
 public:
 	window_impl(const std::string& title, const point& pos, const area& size, uint32_t flags)
-		: impl_(SDL_CreateWindow(title.c_str(), static_cast<int>(size.w), static_cast<int>(size.h),
-								 get_impl_flags(flags)))
 	{
+		auto p =
+			point(pos.x == window::centered ? centered : pos.x, pos.y == window::centered ? centered : pos.y);
+
+		SDL_PropertiesID props = SDL_CreateProperties();
+		SDL_SetStringProperty(props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, title.c_str());
+		SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_X_NUMBER, p.x);
+		SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_Y_NUMBER, p.y);
+		SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, size.w);
+		SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, size.h);
+
+		SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_EXTERNAL_GRAPHICS_CONTEXT_BOOLEAN, true);
+		// For window flags you should use separate window creation properties,
+		// but for easier migration from SDL2 you can use the following:
+		SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_FLAGS_NUMBER, get_impl_flags(flags));
+		impl_ = std::unique_ptr<SDL_Window, window_deleter>(SDL_CreateWindowWithProperties(props));
+		SDL_DestroyProperties(props);
+
 		if(impl_ == nullptr)
 		{
 			OS_SDL_ERROR_HANDLER_VOID();
 		}
-		set_position(point(pos.x == window::centered ? centered : pos.x,
-						   pos.y == window::centered ? centered : pos.y));
 	}
 
 	auto get_impl() const noexcept -> SDL_Window*

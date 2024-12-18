@@ -14,6 +14,7 @@ inline void set_hint(const std::string& hint, const std::string& value)
 {
     static const std::map<std::string, std::string> hint_mapping =
     {
+		{"HINT_WINDOW_ACTIVATE_WHEN_SHOWN", SDL_HINT_WINDOW_ACTIVATE_WHEN_SHOWN},
         {"HINT_MOUSE_FOCUS_CLICKTHROUGH", SDL_HINT_MOUSE_FOCUS_CLICKTHROUGH},
         {"HINT_MOUSE_AUTO_CAPTURE", SDL_HINT_MOUSE_AUTO_CAPTURE},
         {"HINT_BORDERLESS_WINDOWED_STYLE", "SDL_BORDERLESS_WINDOWED_STYLE"},

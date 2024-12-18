@@ -285,7 +285,7 @@ mappings key_map = []()
 		{key::ac_exit, SDL_SCANCODE_AC_EXIT},
 		{key::ac_save, SDL_SCANCODE_AC_SAVE},
 		{key::ac_print, SDL_SCANCODE_AC_PRINT},
-		{key::ac_propertiues, SDL_SCANCODE_AC_PROPERTIES},
+		{key::ac_properties, SDL_SCANCODE_AC_PROPERTIES},
 		{key::ac_search, SDL_SCANCODE_AC_SEARCH},
 		{key::ac_home, SDL_SCANCODE_AC_HOME},
 		{key::ac_back, SDL_SCANCODE_AC_BACK},

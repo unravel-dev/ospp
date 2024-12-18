@@ -16,7 +16,6 @@ inline void shutdown() noexcept
 inline auto init() -> bool
 {
 	SDL_SetHint("SDL_WINDOWS_DPI_SCALING", "false");
-	//SDL_SetHint(SDL_HINT_VIDEO_EXTERNAL_CONTEXT, "true");
 
 	auto result =
 		SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC | SDL_INIT_GAMEPAD);
