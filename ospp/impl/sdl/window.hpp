@@ -136,6 +136,7 @@ struct window_deleter
 {
 	void operator()(SDL_Window* window) const noexcept
 	{
+		SDL_StopTextInput(window);
 		SDL_DestroyWindow(window);
 	}
 };
@@ -169,6 +170,8 @@ public:
 		{
 			OS_SDL_ERROR_HANDLER_VOID();
 		}
+
+		SDL_StartTextInput(impl_.get());
 	}
 
 	auto get_impl() const noexcept -> SDL_Window*
