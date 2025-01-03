@@ -51,8 +51,25 @@ inline auto to_window_event_id(uint32_t id) -> window_event_id
 	return window_event_id::none;
 }
 
+void fill_drop_event(event& ev, const SDL_Event& e)
+{
+	ev.drop.window_id = e.drop.windowID;
+	ev.drop.x = e.drop.x;
+	ev.drop.y = e.drop.y;
+	if(e.drop.source != nullptr)
+	{
+		ev.drop.source = e.drop.source;
+	}
+	if(e.drop.data != nullptr)
+	{
+		ev.drop.data = e.drop.data;
+	}
+}
+
 inline auto to_event(const SDL_Event& e) -> event
 {
+
+
 	event ev{};
 	switch(e.type)
 	{
@@ -177,22 +194,23 @@ inline auto to_event(const SDL_Event& e) -> event
 			break;
 		case SDL_EVENT_DROP_FILE:
             ev.type = events::drop_file;
+			fill_drop_event(ev, e);
+			break;
         case SDL_EVENT_DROP_TEXT:
             ev.type = events::drop_text;
+			fill_drop_event(ev, e);
+			break;
         case SDL_EVENT_DROP_BEGIN:
             ev.type = events::drop_begin;
+			fill_drop_event(ev, e);
+			break;
         case SDL_EVENT_DROP_COMPLETE:
             ev.type = events::drop_complete;
+			fill_drop_event(ev, e);
+			break;
         case SDL_EVENT_DROP_POSITION:
             ev.type = events::drop_position;
-
-			ev.drop.window_id = e.drop.windowID;
-            ev.drop.x = e.drop.x;
-            ev.drop.y = e.drop.y;
-			if(e.drop.data != nullptr)
-			{
-				ev.drop.data = e.drop.data;
-			}
+			fill_drop_event(ev, e);
 			break;
 		default:
 			if(e.type >= SDL_EVENT_WINDOW_FIRST && e.type <= SDL_EVENT_WINDOW_LAST)
