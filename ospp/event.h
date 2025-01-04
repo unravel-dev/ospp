@@ -57,16 +57,22 @@ enum class events : uint8_t
 
 	clipboard_update,
 	drop_file,
-    drop_text,
-    drop_begin,
-    drop_complete,
-    drop_position,
+	drop_text,
+	drop_begin,
+	drop_complete,
+	drop_position,
 
-    display_orientation,
-    display_connected,
-    display_disconnected,
-    display_moved,
-    display_content_scale_changed
+	joystic_added,
+	joystic_removed,
+
+	gamepad_added,
+	gamepad_removed,
+
+	display_orientation,
+	display_connected,
+	display_disconnected,
+	display_moved,
+	display_content_scale_changed
 };
 
 enum class state : uint8_t
@@ -90,11 +96,11 @@ struct window_event
 
 struct drop_event
 {
-	std::string source{};	/**< The source app that sent this drop event, or empty if that isn't available */
+	std::string source{}; /**< The source app that sent this drop event, or empty if that isn't available */
 	std::string data{};
 	uint32_t window_id{};
-    float x{};            /**< X coordinate, relative to window (not on begin) */
-    float y{};            /**< Y coordinate, relative to window (not on begin) */
+	float x{}; /**< X coordinate, relative to window (not on begin) */
+	float y{}; /**< Y coordinate, relative to window (not on begin) */
 };
 
 struct text_input_event
@@ -143,7 +149,16 @@ struct key_event
 
 struct display_event
 {
+};
 
+struct joystick_device_event
+{
+	uint32_t which{}; /**< The joystick instance id */
+};
+
+struct gamepad_device_event
+{
+	uint32_t which{}; /**< The joystick instance id */
 };
 
 struct event
@@ -158,7 +173,9 @@ struct event
 		key_event key;
 		mouse_motion_event motion;
 		quit_event quit;
-        display_event display;
+		display_event display;
+		joystick_device_event joystick_device;
+		gamepad_device_event gamepad_device;
 	};
 	events type;
 };

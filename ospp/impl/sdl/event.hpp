@@ -212,6 +212,24 @@ inline auto to_event(const SDL_Event& e) -> event
             ev.type = events::drop_position;
 			fill_drop_event(ev, e);
 			break;
+
+		case SDL_EVENT_GAMEPAD_ADDED:
+			ev.type = events::gamepad_added;
+			ev.gamepad_device.which = e.gdevice.which;
+			break;
+		case SDL_EVENT_GAMEPAD_REMOVED:
+			ev.type = events::gamepad_removed;
+			ev.gamepad_device.which = e.gdevice.which;
+			break;
+
+		case SDL_EVENT_JOYSTICK_ADDED:
+			ev.type = events::joystic_added;
+			ev.joystick_device.which = e.jdevice.which;
+			break;
+		case SDL_EVENT_JOYSTICK_REMOVED:
+			ev.type = events::joystic_removed;
+			ev.joystick_device.which = e.jdevice.which;
+			break;
 		default:
 			if(e.type >= SDL_EVENT_WINDOW_FIRST && e.type <= SDL_EVENT_WINDOW_LAST)
 			{

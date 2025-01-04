@@ -130,7 +130,14 @@ inline auto to_event(const ::mml::platform_event& e, uint32_t window_id) -> even
 					break;
 			}
 			break;
-
+		case ::mml::platform_event::joystick_connected:
+			ev.type = events::joystic_added;
+			ev.joystick_device.which = e.joystick_connect.joystick_id;
+			break;
+		case ::mml::platform_event::joystick_disconnected:
+			ev.type = events::joystic_removed;
+			ev.joystick_device.which = e.joystick_connect.joystick_id;
+			break;
 		case ::mml::platform_event::touch_began:
 			ev.type = events::finger_down;
 			break;

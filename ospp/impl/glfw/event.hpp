@@ -237,6 +237,44 @@ inline void set_callbacks(GLFWwindow* window)
 							}
 						});
 
+	glfwSetJoystickCallback(
+		[](int jid, int e)
+		{
+			bool is_gamepad = glfwJoystickIsGamepad(jid);
+
+			if(e == GLFW_CONNECTED)
+			{
+				event ev{};
+				if(is_gamepad)
+				{
+					ev.gamepad_device.which = jid;
+					ev.type = events::gamepad_added;
+				}
+				else
+				{
+					ev.joystick_device.which = jid;
+					ev.type = events::joystic_added;
+				}
+				push_event(std::move(ev));
+			}
+			else if(e == GLFW_DISCONNECTED)
+			{
+				event ev{};
+
+				if(is_gamepad)
+				{
+					ev.gamepad_device.which = jid;
+					ev.type = events::gamepad_removed;
+				}
+				else
+				{
+					ev.joystick_device.which = jid;
+					ev.type = events::joystic_removed;
+				}
+				push_event(std::move(ev));
+			}
+		});
+
 	glfwSetWindowRefreshCallback(window,
 								 [](GLFWwindow* window) {
 
