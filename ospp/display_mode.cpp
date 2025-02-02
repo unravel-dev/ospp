@@ -183,6 +183,11 @@ auto get_usable_bounds(int index) -> bounds
 	return usable;
 }
 
+auto get_content_scale(int index) -> float
+{
+	return impl::get_content_scale(index);
+}
+
 auto to_string(const mode& m) -> std::string
 {
 	std::stringstream ss;

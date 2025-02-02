@@ -198,15 +198,6 @@ public:
 		return SDL_GetWindowID(impl_.get());
 	}
 
-	auto get_brightness() const noexcept -> float
-	{
-		return 1.0f;
-	}
-
-	void set_brightness(float bright)
-	{
-	}
-
 	void set_size(const area& size) noexcept
 	{
 		SDL_SetWindowSize(impl_.get(), static_cast<int>(size.w), static_cast<int>(size.h));

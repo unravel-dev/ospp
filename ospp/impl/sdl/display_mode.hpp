@@ -140,6 +140,13 @@ inline auto get_display_usable_bounds(int index = 0) -> ::os::display::bounds
 
 	return {};
 }
+
+inline auto get_content_scale(int index = 0) -> float
+{
+	auto display_id = to_display_id(index);
+	return SDL_GetDisplayContentScale(display_id);
+}
+
 } // namespace sdl
 } // namespace detail
 } // namespace os

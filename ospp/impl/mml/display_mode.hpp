@@ -70,6 +70,13 @@ inline auto get_display_usable_bounds(int index = 0) -> ::os::display::bounds
 	auto bounds = ::mml::video_bounds::get_display_usable_bounds(index);
 	return from_impl(bounds);
 }
+
+
+inline auto get_content_scale(int index = 0) -> float
+{
+	return 1.0f;
+}
+
 } // namespace mml
 } // namespace detail
 } // namespace os

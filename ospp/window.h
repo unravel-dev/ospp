@@ -46,9 +46,6 @@ public:
 	auto is_open() const noexcept -> bool;
 	auto get_id() const noexcept -> uint32_t;
 
-	void set_brightness(float bright);
-	auto get_brightness() const noexcept -> float;
-
 	void set_size(uint32_t width, uint32_t height) noexcept;
 	void set_size(const area& size) noexcept;
 	auto get_size() const noexcept -> area;

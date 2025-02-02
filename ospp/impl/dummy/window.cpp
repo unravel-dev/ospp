@@ -46,15 +46,6 @@ namespace os
         return impl_ != nullptr;
     }
 
-    auto window::get_brightness() const noexcept -> float
-    {
-        return {};
-    }
-
-    void window::set_brightness(float bright)
-    {
-    }
-
     auto window::get_id() const noexcept -> uint32_t
     {
         return {};

@@ -38,13 +38,13 @@ inline auto get_impl_flags(uint32_t flags) -> uint32_t
 	{
 		result |= ::mml::style::hidden;
 	}
-	if(flags & window::borderless)
-	{
-		result = ::mml::style::none;
-	}
 	if(flags & window::resizable)
 	{
 		result |= ::mml::style::resize;
+	}
+	if(flags & window::borderless)
+	{
+		result = ::mml::style::none;
 	}
 	if(flags & window::always_on_top)
 	{
@@ -154,15 +154,6 @@ public:
 	auto get_id() const noexcept -> uint32_t
 	{
 		return id_;
-	}
-
-	auto get_brightness() const noexcept -> float
-	{
-		return 1.0f;
-	}
-
-	void set_brightness(float)
-	{
 	}
 
 	void set_size(const area& size) noexcept

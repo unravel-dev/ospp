@@ -19,7 +19,10 @@ auto to_impl(const device_t& dev) -> uint32_t
 auto open_device(id_t id) noexcept -> device_t
 {
 	device_t dev;
-	dev.data = new id_t(id);
+	if(id < ::mml::joystick::count)
+	{
+		dev.data = new id_t(id);
+	}
 	dev.id = id;
 	return dev;
 }

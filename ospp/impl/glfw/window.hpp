@@ -290,15 +290,6 @@ public:
 		return id_;
 	}
 
-	auto get_brightness() const noexcept -> float
-	{
-		return 1.0f;
-	}
-
-	void set_brightness(float)
-	{
-	}
-
 	void set_size(const area& size) noexcept
 	{
 		glfwSetWindowSize(impl_.get(), static_cast<int>(size.w), static_cast<int>(size.h));

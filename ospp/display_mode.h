@@ -34,7 +34,7 @@ auto get_closest_mode(const mode& to, int index = 0) -> mode;
 auto get_closest_mode(uint32_t width, uint32_t height, int index = 0) -> mode;
 auto get_bounds(int index = 0) -> bounds;
 auto get_usable_bounds(int index = 0) -> bounds;
-
+auto get_content_scale(int index = 0) -> float;
 auto to_string(const mode& m) -> std::string;
 auto to_string(const bounds& b) -> std::string;
 } // namespace display

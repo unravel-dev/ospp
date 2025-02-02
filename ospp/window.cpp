@@ -47,16 +47,6 @@ auto window::is_open() const noexcept -> bool
 	return impl_ != nullptr;
 }
 
-auto window::get_brightness() const noexcept -> float
-{
-	return this_impl->get_brightness();
-}
-
-void window::set_brightness(float bright)
-{
-	this_impl->set_brightness(bright);
-}
-
 auto window::get_id() const noexcept -> uint32_t
 {
 	return this_impl->get_id();

@@ -298,6 +298,10 @@ inline void set_callbacks(GLFWwindow* window)
 	glfwSetWindowContentScaleCallback(window,
 									  [](GLFWwindow* window, float xscale, float yscale) {
 
+										  event ev{};
+										  ev.type = events::display_content_scale_changed;
+										  push_event(std::move(ev));
+
 									  });
 }
 

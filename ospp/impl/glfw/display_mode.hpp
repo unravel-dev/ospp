@@ -138,6 +138,20 @@ inline auto get_display_usable_bounds(int index = 0) -> ::os::display::bounds
 
 	return result;
 }
+
+inline auto get_content_scale(int index = 0) -> float
+{
+	int mointor_count{0};
+	auto monitors = glfwGetMonitors(&mointor_count);
+	auto monitor = monitors[index];
+
+	float xscale = 1.0f;
+	float yscale = 1.0f;
+	glfwGetMonitorContentScale(monitor, &xscale, &yscale);
+
+	return std::max(xscale, yscale);
+}
+
 } // namespace glfw
 } // namespace detail
 } // namespace os
