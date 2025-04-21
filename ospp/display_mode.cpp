@@ -4,7 +4,9 @@
 
 #if defined(SDL_BACKEND)
 #include "impl/sdl/display_mode.hpp"
+#ifndef impl
 #define impl detail::sdl
+#endif
 #elif defined(GLFW_BACKEND)
 #include "impl/glfw/display_mode.hpp"
 #define impl detail::glfw

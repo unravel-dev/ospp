@@ -2,7 +2,9 @@
 
 #if defined(SDL_BACKEND)
 #include "impl/sdl/clipboard.hpp"
+#ifndef impl
 #define impl detail::sdl
+#endif
 #elif defined(GLFW_BACKEND)
 #include "impl/glfw/clipboard.hpp"
 #define impl detail::glfw

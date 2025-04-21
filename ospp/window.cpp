@@ -3,13 +3,13 @@
 
 #if defined(SDL_BACKEND)
 #include "impl/sdl/window.hpp"
-using impl_type = os::detail::sdl::window_impl;
+using window_impl_type = os::detail::sdl::window_impl;
 #elif defined(MML_BACKEND)
 #include "impl/mml/window.hpp"
-using impl_type = os::detail::mml::window_impl;
+using window_impl_type = os::detail::mml::window_impl;
 #elif defined(GLFW_BACKEND)
 #include "impl/glfw/window.hpp"
-using impl_type = os::detail::glfw::window_impl;
+using window_impl_type = os::detail::glfw::window_impl;
 #else
 #error "unsupported backend"
 #endif
@@ -18,9 +18,9 @@ using impl_type = os::detail::glfw::window_impl;
 
 namespace os
 {
-inline auto to_impl(void* window) -> impl_type*
+inline auto to_impl(void* window) -> window_impl_type*
 {
-	return reinterpret_cast<impl_type*>(window);
+	return reinterpret_cast<window_impl_type*>(window);
 }
 
 window::window(const std::string& title, int32_t x, int32_t y, uint32_t w, uint32_t h, uint32_t flags)
@@ -29,7 +29,7 @@ window::window(const std::string& title, int32_t x, int32_t y, uint32_t w, uint3
 }
 
 window::window(const std::string& title, const point& pos, const area& size, uint32_t flags)
-	: impl_(std::make_shared<impl_type>(title, pos, size, flags))
+	: impl_(std::make_shared<window_impl_type>(title, pos, size, flags))
 {
 }
 
@@ -231,3 +231,5 @@ auto window::get_impl() const noexcept -> void*
 	return this_impl;
 }
 } // namespace os
+
+#undef this_impl

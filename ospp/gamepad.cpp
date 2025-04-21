@@ -2,7 +2,9 @@
 
 #if defined(SDL_BACKEND)
 #include "impl/sdl/gamepad.hpp"
+#ifndef impl
 #define impl detail::sdl
+#endif
 #elif defined(MML_BACKEND)
 #include "impl/mml/gamepad.hpp"
 #define impl detail::mml

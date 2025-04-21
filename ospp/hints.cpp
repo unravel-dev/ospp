@@ -2,7 +2,9 @@
 
 #if defined(SDL_BACKEND)
 #include "impl/sdl/hints.hpp"
+#ifndef impl
 #define impl detail::sdl
+#endif
 #elif defined(MML_BACKEND)
 #include "impl/mml/hints.hpp"
 #define impl detail::mml
