@@ -1,11 +1,11 @@
-![windows](https://github.com/volcoma/ospp/actions/workflows/windows.yml/badge.svg)
-![linux](https://github.com/volcoma/ospp/actions/workflows/linux.yml/badge.svg)
-![macos](https://github.com/volcoma/ospp/actions/workflows/macos.yml/badge.svg)
+![windows](https://github.com/unravel-dev/ospp/actions/workflows/windows.yml/badge.svg)
+![linux](https://github.com/unravel-dev/ospp/actions/workflows/linux.yml/badge.svg)
+![macos](https://github.com/unravel-dev/ospp/actions/workflows/macos.yml/badge.svg)
 
 ## ospp c++14 cross-platform window and input library
 - The library is JUST windowing and input.
 - Wrapping the most popular windowing libraries under one api
-- Supported backends - SDL, GLFW, MML
+- Supported backends - SDL, GLFW
 
 ```c++
 int main()
