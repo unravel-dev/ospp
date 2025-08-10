@@ -202,10 +202,10 @@ void window_impl::process_sensor_events()
             {
                 platform_event event;
                 event.type = platform_event::sensor_changed;
-                event.sensor.type = sensor;
-                event.sensor.x = sensor_value_[i][0];
-                event.sensor.y = sensor_value_[i][1];
-                event.sensor.z = sensor_value_[i][2];
+                event.sensor_ev.type = sensor;
+                event.sensor_ev.x = sensor_value_[i][0];
+                event.sensor_ev.y = sensor_value_[i][1];
+                event.sensor_ev.z = sensor_value_[i][2];
                 push_event(event);
             }
         }

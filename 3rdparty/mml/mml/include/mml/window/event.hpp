@@ -284,7 +284,7 @@ public:
 		touch_event					touch;
 
 		///< sensor event parameters (platform_event::sensor_changed)
-		sensor_event				sensor;
+		sensor_event				sensor_ev;
 	};
 };
 
