@@ -42,6 +42,11 @@ auto window::get_native_display() const -> native_display
 	return this_impl->get_native_display();
 }
 
+auto window::get_display_scale() const -> float
+{
+	return this_impl->get_display_scale();
+}
+
 auto window::is_open() const noexcept -> bool
 {
 	return impl_ != nullptr;

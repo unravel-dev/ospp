@@ -280,6 +280,14 @@ public:
 		return get_native_display_handle();
 	}
 
+	auto get_display_scale() const -> float
+	{
+		float xscale = 1.0f;
+		float yscale = 1.0f;
+		glfwGetWindowContentScale(impl_.get(), &xscale, &yscale);
+		return std::max(xscale, yscale);
+	}
+
 	auto is_open() const noexcept -> bool
 	{
 		return impl_ != nullptr;

@@ -43,6 +43,8 @@ public:
 	auto get_native_handle() const -> native_handle;
 	auto get_native_display() const -> native_display;
 
+	auto get_display_scale() const -> float;
+
 	auto is_open() const noexcept -> bool;
 	auto get_id() const noexcept -> uint32_t;
 

@@ -188,6 +188,11 @@ public:
 		return get_native_display_handle(impl_.get());
 	}
 
+	auto get_display_scale() const -> float
+	{
+		return SDL_GetWindowDisplayScale(impl_.get());
+	}
+
 	auto is_open() const noexcept -> bool
 	{
 		return impl_ != nullptr;
