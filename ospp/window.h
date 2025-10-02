@@ -40,6 +40,8 @@ public:
 	window(const std::string& title, int32_t x, int32_t y, uint32_t w, uint32_t h, uint32_t flags = 0);
 	window(const std::string& title, const point& pos, const area& size, uint32_t flags = 0);
 
+	static auto is_any_focused() -> bool;
+
 	auto get_native_handle() const -> native_handle;
 	auto get_native_display() const -> native_display;
 
@@ -107,5 +109,5 @@ private:
 	std::shared_ptr<void> impl_;
 };
 
-window get_window_by_id();
+
 } // namespace os

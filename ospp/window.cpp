@@ -18,6 +18,7 @@ using window_impl_type = os::detail::glfw::window_impl;
 
 namespace os
 {
+
 inline auto to_impl(void* window) -> window_impl_type*
 {
 	return reinterpret_cast<window_impl_type*>(window);
@@ -32,6 +33,7 @@ window::window(const std::string& title, const point& pos, const area& size, uin
 	: impl_(std::make_shared<window_impl_type>(title, pos, size, flags))
 {
 }
+
 
 auto window::get_native_handle() const -> native_handle
 {
@@ -235,6 +237,12 @@ auto window::get_impl() const noexcept -> void*
 {
 	return this_impl;
 }
+
+auto window::is_any_focused() -> bool
+{
+	return window_impl_type::is_any_focused();
+}
+
 } // namespace os
 
 #undef this_impl

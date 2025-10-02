@@ -213,4 +213,9 @@ namespace os
     {
         return {};
     }
+
+    static auto is_any_focused() noexcept -> bool
+    {
+        return false;
+    }
 }

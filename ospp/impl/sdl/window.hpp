@@ -179,6 +179,11 @@ public:
 		return impl_.get();
 	}
 
+	static auto is_any_focused() noexcept -> bool
+	{
+		return SDL_GetKeyboardFocus() != nullptr;
+	}
+
 	auto get_native_handle() const -> native_handle
 	{
 		return get_native_window_handle(impl_.get());

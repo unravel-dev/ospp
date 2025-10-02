@@ -1,6 +1,7 @@
 #pragma once
 #include "../../keyboard.h"
 
+#include "window.hpp"
 #include "config.hpp"
 #include <cassert>
 #include <map>
@@ -351,20 +352,36 @@ inline auto has_screen_keyboard() noexcept -> bool
 	return SDL_HasScreenKeyboardSupport();
 }
 
-inline void start_text_input() noexcept
+inline void start_text_input(const window& win) noexcept
 {
-	//SDL_StartTextInput();
+	auto window = reinterpret_cast<window_impl*>(win.get_impl());
+	SDL_StartTextInput(window->get_impl());
 }
 
-inline void stop_text_input() noexcept
+inline void stop_text_input(const window& win) noexcept
 {
-	// SDL_StopTextInput();
+	auto window = reinterpret_cast<window_impl*>(win.get_impl());
+	SDL_StopTextInput(window->get_impl());
 }
 
-inline auto is_text_input_active() noexcept -> bool
+inline auto is_text_input_active(const window& win) noexcept -> bool
 {
-	return false;//SDL_TextInputActive() == SDL_TRUE;
+	auto window = reinterpret_cast<window_impl*>(win.get_impl());
+	return SDL_TextInputActive(window->get_impl());
 }
+
+inline void set_text_input_area(const window& win, const point& pos, const area& area, int cursor) noexcept
+{
+	auto window = reinterpret_cast<window_impl*>(win.get_impl());
+	SDL_Rect rect;
+	rect.x = pos.x;
+	rect.y = pos.y;
+	rect.w = area.w;
+	rect.h = area.h;
+	SDL_SetTextInputArea(window->get_impl(), &rect, cursor);
+}
+
+
 } // namespace sdl
 } // namespace detail
 } // namespace os

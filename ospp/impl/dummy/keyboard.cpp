@@ -1,5 +1,5 @@
 #include "keyboard.h"
-
+#include "window.hpp"
 
 namespace os
 {
@@ -23,19 +23,23 @@ namespace os
 
     bool has_screen_keyboard() noexcept
     {
-            return {};
+        return {};
     }
 
-    void start_text_input() noexcept
+    void start_text_input(const window& win) noexcept
     {
     }
 
-    void stop_text_input() noexcept
+    void stop_text_input(const window& win) noexcept
     {
     }
 
-    bool is_text_input_active() noexcept
+    bool is_text_input_active(const window& win) noexcept
     {
         return {};
+    }
+
+    void set_text_input_area(const window& win, const point& pos, const area& area, int cursor) noexcept
+    {
     }
 }

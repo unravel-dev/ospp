@@ -182,10 +182,16 @@ inline auto create_impl(const std::string& title, uint32_t width, uint32_t heigh
 }
 class window_impl;
 
-inline auto get_focused_win() noexcept -> window_impl*&
+inline auto get_focused_win() noexcept -> window_impl*
 {
-	static window_impl* win{nullptr};
-	return win;
+	for(auto& window : get_windows())
+	{
+		if(window->has_focus())
+		{
+			return window;
+		}
+	}
+	return nullptr
 }
 
 struct window_deleter
@@ -248,27 +254,21 @@ public:
 		}
 
 		set_position(pos);
-
-        if(has_focus())
-        {
-            get_focused_win() = this;
-        }
 	}
 
 	~window_impl()
 	{
 		unregister_window(id_);
-
-		auto& focused = get_focused_win();
-		if(focused == this)
-		{
-			focused = nullptr;
-		}
 	}
 
 	auto get_impl() const noexcept -> GLFWwindow*
 	{
 		return impl_.get();
+	}
+
+	static auto is_any_focused() noexcept -> bool
+	{
+		return get_focused_win() != nullptr;
 	}
 
 	auto get_native_handle() const noexcept -> native_handle

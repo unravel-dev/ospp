@@ -345,6 +345,18 @@ public:
 		return impl_.has_focus();
 	}
 
+	static auto is_any_focused() noexcept -> bool
+	{
+		for(auto& window : get_windows())
+		{
+			if(window->has_focus())
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
 private:
 	::mml::window impl_;
 	std::string title_{};

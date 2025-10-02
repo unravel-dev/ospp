@@ -544,7 +544,7 @@ inline auto is_pressed(os::key::code key_code) noexcept -> bool
 {
 	auto impl_key = to_layout_independent_impl(key_code);
 
-	auto& focused_win = os::detail::glfw::get_focused_win();
+	auto focused_win = os::detail::glfw::get_focused_win();
 	if(focused_win)
 	{
 		auto state = glfwGetKey(focused_win->get_impl(), impl_key);
@@ -559,17 +559,21 @@ inline auto has_screen_keyboard() noexcept -> bool
 	return false;
 }
 
-inline void start_text_input() noexcept
+inline void start_text_input(const window& win) noexcept
 {
 }
 
-inline void stop_text_input() noexcept
+inline void stop_text_input(const window& win) noexcept
 {
 }
 
-inline auto is_text_input_active() noexcept -> bool
+inline auto is_text_input_active(const window& win) noexcept -> bool
 {
 	return false;
+}
+
+inline void set_text_input_area(const window& win, const point& pos, const area& area, int cursor) noexcept
+{
 }
 }
 }
