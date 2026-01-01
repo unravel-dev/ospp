@@ -127,6 +127,11 @@ public:
 		unregister_window(id_);
 	}
 
+	static auto get_current_video_driver() -> const char*
+	{
+		return "unknown";
+	}
+
 	auto get_impl() const -> const ::mml::window&
 	{
 		return impl_;

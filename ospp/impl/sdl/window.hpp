@@ -174,6 +174,11 @@ public:
 		SDL_StartTextInput(impl_.get());
 	}
 
+	static auto get_current_video_driver() -> const char*
+	{
+		return SDL_GetCurrentVideoDriver();
+	}
+
 	auto get_impl() const noexcept -> SDL_Window*
 	{
 		return impl_.get();

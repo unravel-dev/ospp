@@ -238,6 +238,11 @@ auto window::get_impl() const noexcept -> void*
 	return this_impl;
 }
 
+auto window::get_current_video_driver() -> const char*
+{
+	return window_impl_type::get_current_video_driver();
+}
+
 auto window::is_any_focused() -> bool
 {
 	return window_impl_type::is_any_focused();

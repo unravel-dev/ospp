@@ -266,6 +266,21 @@ public:
 		return impl_.get();
 	}
 
+	static auto get_current_video_driver() -> const char*
+	{
+		#if defined(GLFW_EXPOSE_NATIVE_WIN32)
+		return "win32";
+		#elif defined(GLFW_EXPOSE_NATIVE_X11)
+		return "x11";
+		#elif defined(GLFW_EXPOSE_NATIVE_COCOA)
+		return "cocoa";
+		#elif defined(GLFW_EXPOSE_NATIVE_WAYLAND)
+		return "wayland";
+		#else
+		return "unknown";
+		#endif
+	}
+
 	static auto is_any_focused() noexcept -> bool
 	{
 		return get_focused_win() != nullptr;

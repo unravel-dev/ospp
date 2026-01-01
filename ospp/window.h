@@ -105,6 +105,7 @@ public:
 
 	auto get_impl() const noexcept -> void*;
 
+	static auto get_current_video_driver() -> const char*;
 private:
 	std::shared_ptr<void> impl_;
 };
