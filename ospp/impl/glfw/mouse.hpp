@@ -56,7 +56,7 @@ inline auto is_button_pressed(button b) noexcept -> bool
 {
 	auto impl_button = to_impl(b);
 
-	auto& focused_win = os::detail::glfw::get_focused_win();
+	auto focused_win = os::detail::glfw::get_focused_win();
 	if(focused_win)
 	{
 		return glfwGetKey(focused_win->get_impl(), impl_button) != GLFW_RELEASE;
@@ -77,7 +77,7 @@ inline auto get_position(const window& win) noexcept -> point
 
 inline auto get_position() noexcept -> point
 {
-	auto& focused_win = os::detail::glfw::get_focused_win();
+	auto focused_win = os::detail::glfw::get_focused_win();
 	if(focused_win)
 	{
         auto window_pos = focused_win->get_position();
@@ -98,7 +98,7 @@ inline void set_position(const point& pos, const window& win) noexcept
 }
 inline void set_position(const point& pos) noexcept
 {
-	auto& focused_win = os::detail::glfw::get_focused_win();
+	auto focused_win = os::detail::glfw::get_focused_win();
 	if(focused_win)
 	{
         auto window_pos = focused_win->get_position();
@@ -113,7 +113,7 @@ inline void capture(bool enabled)
 
 inline void disable(bool enabled)
 {
-	auto& focused_win = os::detail::glfw::get_focused_win();
+	auto focused_win = os::detail::glfw::get_focused_win();
 	if(focused_win)
 	{
 		focused_win->grab_input(enabled);

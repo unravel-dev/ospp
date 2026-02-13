@@ -84,11 +84,11 @@ inline auto get_windows() noexcept -> std::vector<window_impl*>&
 	return windows;
 }
 
-inline auto register_window(window_impl* impl) -> uint32_t
+inline auto register_window(window_impl* window) -> uint32_t
 {
 	static uint32_t id{0};
 	auto& windows = get_windows();
-	windows.emplace_back(impl);
+	windows.emplace_back(window);
 	return ++id;
 }
 

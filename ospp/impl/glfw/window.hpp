@@ -182,17 +182,13 @@ inline auto create_impl(const std::string& title, uint32_t width, uint32_t heigh
 }
 class window_impl;
 
-inline auto get_focused_win() noexcept -> window_impl*
+inline auto get_windows() noexcept -> std::vector<window_impl*>&
 {
-	for(auto& window : get_windows())
-	{
-		if(window->has_focus())
-		{
-			return window;
-		}
-	}
-	return nullptr
+	static std::vector<window_impl*> windows;
+	return windows;
 }
+
+auto get_focused_win() noexcept -> window_impl*;
 
 struct window_deleter
 {
@@ -202,17 +198,11 @@ struct window_deleter
 	}
 };
 
-inline auto get_windows() noexcept -> std::vector<window_impl*>&
-{
-	static std::vector<window_impl*> windows;
-	return windows;
-}
-
-inline auto register_window(window_impl* impl) -> uint32_t
+inline auto register_window(window_impl* window) -> uint32_t
 {
 	static uint32_t id{0};
 	auto& windows = get_windows();
-	windows.emplace_back(impl);
+	windows.emplace_back(window);
 	return ++id;
 }
 
@@ -475,7 +465,7 @@ public:
 		glfwFocusWindow(impl_.get());
 	}
 
-    bool has_focus()
+    bool has_focus() const noexcept
     {
         return glfwGetWindowAttrib(impl_.get(), GLFW_FOCUSED) != 0;
     }
@@ -514,6 +504,19 @@ private:
 	std::string title_{};
 	std::unique_ptr<GLFWwindow, window_deleter> impl_;
 };
+
+inline auto get_focused_win() noexcept -> window_impl*
+{
+	for(auto& window : get_windows())
+	{
+		if(window->has_focus())
+		{
+			return window;
+		}
+	}
+	return nullptr;
+}
+
 }
 }
 }

@@ -160,10 +160,10 @@ inline void pump_events() noexcept
 	auto& windows = get_windows();
 	for(auto& window : windows)
 	{
-		auto& impl = window->get_impl();
+		auto& win_impl = window->get_impl();
 
 		::mml::platform_event ev{};
-		if(impl.poll_event(ev))
+		if(win_impl.poll_event(ev))
 		{
 			if(ev.type == ::mml::platform_event::closed)
 			{

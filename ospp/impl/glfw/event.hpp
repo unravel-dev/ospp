@@ -35,8 +35,7 @@ inline auto to_state(int id) -> state
 inline auto get_impl(GLFWwindow* window) -> window_impl*
 {
 	auto user_data = glfwGetWindowUserPointer(window);
-	auto impl = reinterpret_cast<window_impl*>(user_data);
-	return impl;
+	return reinterpret_cast<window_impl*>(user_data);
 }
 
 inline void set_callbacks(GLFWwindow* window)
@@ -44,11 +43,11 @@ inline void set_callbacks(GLFWwindow* window)
 	glfwSetWindowCloseCallback(window,
 							   [](GLFWwindow* window)
 							   {
-								   auto impl = get_impl(window);
+								   auto win_impl = get_impl(window);
 
 								   event ev{};
 								   ev.type = events::window;
-								   ev.window.window_id = impl->get_id();
+								   ev.window.window_id = win_impl->get_id();
 								   ev.window.type = window_event_id::close;
 
 								   push_event(std::move(ev));
@@ -57,17 +56,17 @@ inline void set_callbacks(GLFWwindow* window)
 	glfwSetWindowFocusCallback(window,
 							   [](GLFWwindow* window, int focused)
 							   {
-								   auto impl = get_impl(window);
+								   auto win_impl = get_impl(window);
 
-								   auto& focused_win = get_focused_win();
-								   if(focused == GL_TRUE)
+								   auto focused_win = get_focused_win();
+								   if(focused_win == nullptr)
 								   {
-									   focused_win = impl;
+									   focused_win = win_impl;
 								   }
 								   else
 								   {
 									   // only if this was the focused one
-									   if(focused_win == impl)
+									   if(focused_win == win_impl)
 									   {
 										   focused_win = nullptr;
 									   }
@@ -75,7 +74,7 @@ inline void set_callbacks(GLFWwindow* window)
 
 								   event ev{};
 								   ev.type = events::window;
-								   ev.window.window_id = impl->get_id();
+								   ev.window.window_id = win_impl->get_id();
 								   ev.window.type = focused == GL_TRUE ? window_event_id::focus_gained
 																	   : window_event_id::focus_lost;
 
@@ -85,11 +84,11 @@ inline void set_callbacks(GLFWwindow* window)
 	glfwSetWindowSizeCallback(window,
 							  [](GLFWwindow* window, int w, int h)
 							  {
-								  auto impl = get_impl(window);
+								  auto win_impl = get_impl(window);
 
 								  event ev{};
 								  ev.type = events::window;
-								  ev.window.window_id = impl->get_id();
+								  ev.window.window_id = win_impl->get_id();
 								  ev.window.type = window_event_id::resized;
 								  ev.window.data1 = static_cast<int32_t>(w);
 								  ev.window.data2 = static_cast<int32_t>(h);
@@ -100,11 +99,11 @@ inline void set_callbacks(GLFWwindow* window)
 	glfwSetWindowPosCallback(window,
 							 [](GLFWwindow* window, int x, int y)
 							 {
-								 auto impl = get_impl(window);
+								 auto win_impl = get_impl(window);
 
 								 event ev{};
 								 ev.type = events::window;
-								 ev.window.window_id = impl->get_id();
+								 ev.window.window_id = win_impl->get_id();
 								 ev.window.type = window_event_id::moved;
 								 ev.window.data1 = static_cast<int32_t>(x);
 								 ev.window.data2 = static_cast<int32_t>(y);
@@ -115,11 +114,11 @@ inline void set_callbacks(GLFWwindow* window)
 	glfwSetWindowMaximizeCallback(window,
 								  [](GLFWwindow* window, int mode)
 								  {
-									  auto impl = get_impl(window);
+									  auto win_impl = get_impl(window);
 
 									  event ev{};
 									  ev.type = events::window;
-									  ev.window.window_id = impl->get_id();
+									  ev.window.window_id = win_impl->get_id();
 									  ev.window.type = mode == GLFW_TRUE ? window_event_id::maximized
 																		 : window_event_id::restored;
 
@@ -129,11 +128,11 @@ inline void set_callbacks(GLFWwindow* window)
 	glfwSetCursorEnterCallback(window,
 							   [](GLFWwindow* window, int mode)
 							   {
-								   auto impl = get_impl(window);
+								   auto win_impl = get_impl(window);
 
 								   event ev{};
 								   ev.type = events::window;
-								   ev.window.window_id = impl->get_id();
+								   ev.window.window_id = win_impl->get_id();
 								   ev.window.type =
 									   mode == GLFW_TRUE ? window_event_id::enter : window_event_id::leave;
 
@@ -143,11 +142,11 @@ inline void set_callbacks(GLFWwindow* window)
 	glfwSetCursorPosCallback(window,
 							 [](GLFWwindow* window, double x, double y)
 							 {
-								 auto impl = get_impl(window);
+								 auto win_impl = get_impl(window);
 
 								 event ev{};
 								 ev.type = events::mouse_motion;
-								 ev.motion.window_id = impl->get_id();
+								 ev.motion.window_id = win_impl->get_id();
 								 ev.motion.x = static_cast<int32_t>(x);
 								 ev.motion.y = static_cast<int32_t>(y);
 
@@ -157,18 +156,18 @@ inline void set_callbacks(GLFWwindow* window)
 	glfwSetMouseButtonCallback(window,
 							   [](GLFWwindow* window, int button, int action, int)
 							   {
-								   auto impl = get_impl(window);
+								   auto win_impl = get_impl(window);
 
 								   point pos{};
 								   double x{};
 								   double y{};
-								   glfwGetCursorPos(impl->get_impl(), &x, &y);
+								   glfwGetCursorPos(win_impl->get_impl(), &x, &y);
 								   pos.x = static_cast<int32_t>(x);
 								   pos.y = static_cast<int32_t>(y);
 
 								   event ev{};
 								   ev.type = events::mouse_button;
-								   ev.button.window_id = impl->get_id();
+								   ev.button.window_id = win_impl->get_id();
 								   ev.button.button = mouse::detail::glfw::from_impl(button);
 								   ev.button.state_id = to_state(action);
 								   ev.button.x = pos.x;
@@ -180,11 +179,11 @@ inline void set_callbacks(GLFWwindow* window)
 	glfwSetScrollCallback(window,
 						  [](GLFWwindow* window, double xoffs, double yoffs)
 						  {
-							  auto impl = get_impl(window);
+							  auto win_impl = get_impl(window);
 
 							  event ev{};
 							  ev.type = events::mouse_wheel;
-							  ev.wheel.window_id = impl->get_id();
+							  ev.wheel.window_id = win_impl->get_id();
 							  ev.wheel.x = xoffs;
 							  ev.wheel.y = yoffs;
 
@@ -194,11 +193,11 @@ inline void set_callbacks(GLFWwindow* window)
 	glfwSetCharModsCallback(window,
 							[](GLFWwindow* window, unsigned int unicode_codepoint, int)
 							{
-								auto impl = get_impl(window);
+								auto win_impl = get_impl(window);
 
 								event ev{};
 								ev.type = events::text_input;
-								ev.text.window_id = impl->get_id();
+								ev.text.window_id = win_impl->get_id();
 								ev.text.text =
 									std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t>{}.to_bytes(
 										unicode_codepoint);
@@ -208,12 +207,12 @@ inline void set_callbacks(GLFWwindow* window)
 	glfwSetKeyCallback(window,
 					   [](GLFWwindow* window, int key, int scancode, int action, int mods)
 					   {
-						   auto impl = get_impl(window);
+						   auto win_impl = get_impl(window);
 
 						   (void)scancode;
 						   event ev{};
 						   ev.type = action == GLFW_RELEASE ? events::key_up : events::key_down;
-						   ev.key.window_id = impl->get_id();
+						   ev.key.window_id = win_impl->get_id();
 						   ev.key.code = detail::glfw::from_layout_independent_impl(key);
 						   ev.key.alt = (mods & GLFW_MOD_ALT) != 0;
 						   ev.key.ctrl = (mods & GLFW_MOD_CONTROL) != 0;
@@ -225,13 +224,13 @@ inline void set_callbacks(GLFWwindow* window)
 	glfwSetDropCallback(window,
 						[](GLFWwindow* window, int count, const char** paths)
 						{
-							auto impl = get_impl(window);
+							auto win_impl = get_impl(window);
 
 							for(int i = 0; i < count; ++i)
 							{
 								event ev{};
 								ev.type = events::drop_file;
-								ev.drop.window_id = impl->get_id();
+								ev.drop.window_id = win_impl->get_id();
 								ev.drop.data = paths[i];
 								push_event(std::move(ev));
 							}

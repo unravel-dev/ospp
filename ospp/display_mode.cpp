@@ -9,10 +9,14 @@
 #endif
 #elif defined(GLFW_BACKEND)
 #include "impl/glfw/display_mode.hpp"
+#ifndef impl
 #define impl detail::glfw
+#endif
 #elif defined(MML_BACKEND)
 #include "impl/mml/display_mode.hpp"
+#ifndef impl
 #define impl detail::mml
+#endif
 #else
 #error "unsupported backend"
 #endif
