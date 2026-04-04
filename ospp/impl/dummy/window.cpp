@@ -46,6 +46,11 @@ namespace os
         return 1.0f;
     }
 
+    auto window::get_content_scale() const -> float
+    {
+        return 1.0f;
+    }
+
     auto window::is_open() const noexcept -> bool
     {
         return impl_ != nullptr;
@@ -69,6 +74,11 @@ namespace os
     auto window::get_size() const noexcept -> area
     {
         return this_impl->a;
+    }
+
+    auto window::get_frame_size() const noexcept -> frame_insets
+    {
+        return {};
     }
 
     void window::set_maximum_size(uint32_t width, uint32_t height) noexcept
@@ -142,6 +152,11 @@ namespace os
 
     void window::restore() noexcept
     {
+    }
+
+    auto window::is_minimized() const noexcept -> bool
+    {
+        return false;
     }
 
     void window::raise() noexcept

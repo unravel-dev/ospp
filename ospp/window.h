@@ -47,12 +47,18 @@ public:
 
 	auto get_display_scale() const -> float;
 
+	/// GLFW-style HiDPI factor (per-window DPI / 96 on Windows; 1 on X11 until enhanced).
+	auto get_content_scale() const -> float;
+
 	auto is_open() const noexcept -> bool;
 	auto get_id() const noexcept -> uint32_t;
 
 	void set_size(uint32_t width, uint32_t height) noexcept;
 	void set_size(const area& size) noexcept;
 	auto get_size() const noexcept -> area;
+
+	/// Client-area border sizes in window coordinates (top includes title bar). May be zero if unknown.
+	auto get_frame_size() const noexcept -> frame_insets;
 
 	void set_maximum_size(uint32_t width, uint32_t height) noexcept;
 	void set_maximum_size(const area& size) noexcept;

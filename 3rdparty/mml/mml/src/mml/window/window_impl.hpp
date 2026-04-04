@@ -131,6 +131,15 @@ public:
     virtual void set_size(const std::array<std::uint32_t, 2>& size) = 0;
 
     ////////////////////////////////////////////////////////////
+    /// \brief Get window decoration sizes around the client area
+    ///
+    /// Returns \a left, \a top, \a right, \a bottom in pixels. \a top includes
+    /// the title bar. Defaults to zero when unsupported or undecorated.
+    ///
+    ////////////////////////////////////////////////////////////
+    virtual std::array<std::int32_t, 4> get_frame_size() const;
+
+    ////////////////////////////////////////////////////////////
     /// \brief Change the title of the window
     ///
     /// \param title New title
@@ -207,6 +216,11 @@ public:
     ///
     ////////////////////////////////////////////////////////////
     virtual bool has_focus() const = 0;
+
+    virtual bool is_minimized() const;
+    virtual float get_display_scale() const;
+    /// GLFW-style scale from window DPI (max of axes / 96 on Win32); 1 if unknown.
+    virtual float get_content_scale() const;
 
 	////////////////////////////////////////////////////////////
 	/// \brief Push a new event into the event queue

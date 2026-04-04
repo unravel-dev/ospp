@@ -217,6 +217,17 @@ void window::set_size(const std::array<std::uint32_t, 2>& size)
 
 
 ////////////////////////////////////////////////////////////
+std::array<std::int32_t, 4> window::get_frame_size() const
+{
+    if(!impl_)
+    {
+        return {{0, 0, 0, 0}};
+    }
+    return impl_->get_frame_size();
+}
+
+
+////////////////////////////////////////////////////////////
 void window::set_title(const std::string& title)
 {
     if (impl_)
@@ -326,6 +337,35 @@ void window::request_focus()
 bool window::has_focus() const
 {
     return impl_ && impl_->has_focus();
+}
+
+
+////////////////////////////////////////////////////////////
+bool window::is_minimized() const
+{
+    return impl_ && impl_->is_minimized();
+}
+
+
+////////////////////////////////////////////////////////////
+float window::get_display_scale() const
+{
+    if(!impl_)
+    {
+        return 1.f;
+    }
+    return impl_->get_display_scale();
+}
+
+
+////////////////////////////////////////////////////////////
+float window::get_content_scale() const
+{
+    if(!impl_)
+    {
+        return 1.f;
+    }
+    return impl_->get_content_scale();
 }
 
 

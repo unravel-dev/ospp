@@ -246,8 +246,8 @@ bool ewmhSupported()
 	return parent;
 }
 
-// Get the Frame Extents from EWMH WMs that support it.
-bool getEWMHFrameExtents(::Display* disp, ::Window win, long& xFrameExtent, long& yFrameExtent)
+// Get the Frame Extents from EWMH WMs that support it (left, right, top, bottom per EWMH).
+bool getEWMHFrameExtents(::Display* disp, ::Window win, long& left, long& right, long& top, long& bottom)
 {
 	if(!ewmhSupported())
 		return false;
@@ -274,8 +274,10 @@ bool getEWMHFrameExtents(::Display* disp, ::Window win, long& xFrameExtent, long
 
 		long* extents = (long*)data;
 
-		xFrameExtent = extents[0]; // Left.
-		yFrameExtent = extents[2]; // Top.
+		left = extents[0];
+		right = extents[1];
+		top = extents[2];
+		bottom = extents[3];
 	}
 
 	// Always free data.
@@ -1001,14 +1003,17 @@ std::array<std::int32_t, 2> window_impl_x11::get_position() const
 	// CASE 2: most modern WMs support EWMH and can define _NET_FRAME_EXTENTS
 	// with the exact frame size to subtract, so if present, we prefer it and
 	// query it first. According to spec, this already includes any borders.
-	long xFrameExtent, yFrameExtent;
+	long frame_left = 0;
+	long frame_right = 0;
+	long frame_top = 0;
+	long frame_bottom = 0;
 
-	if(getEWMHFrameExtents(display_, window_, xFrameExtent, yFrameExtent))
+	if(getEWMHFrameExtents(display_, window_, frame_left, frame_right, frame_top, frame_bottom))
 	{
 		// Get final X/Y coordinates: subtract EWMH frame extents from
 		// absolute window position.
 		return std::array<std::int32_t, 2>{
-			{std::int32_t(xAbsRelToRoot - xFrameExtent), std::int32_t(yAbsRelToRoot - yFrameExtent)}};
+			{std::int32_t(xAbsRelToRoot - frame_left), std::int32_t(yAbsRelToRoot - frame_top)}};
 	}
 
 	// CASE 3: EWMH frame extents were not available, use geometry.
@@ -1057,6 +1062,21 @@ std::array<std::uint32_t, 2> window_impl_x11::get_size() const
 	XGetWindowAttributes(display_, window_, &attributes);
 	return std::array<std::uint32_t, 2>{
 		{static_cast<std::uint32_t>(attributes.width), static_cast<std::uint32_t>(attributes.height)}};
+}
+
+////////////////////////////////////////////////////////////
+std::array<std::int32_t, 4> window_impl_x11::get_frame_size() const
+{
+	long left = 0;
+	long right = 0;
+	long top = 0;
+	long bottom = 0;
+	if(getEWMHFrameExtents(display_, window_, left, right, top, bottom))
+	{
+		return {{static_cast<std::int32_t>(left), static_cast<std::int32_t>(top),
+				 static_cast<std::int32_t>(right), static_cast<std::int32_t>(bottom)}};
+	}
+	return {{0, 0, 0, 0}};
 }
 
 ////////////////////////////////////////////////////////////
@@ -1475,6 +1495,37 @@ void window_impl_x11::request_focus()
 		XSetWMHints(display_, window_, hints);
 		XFree(hints);
 	}
+}
+
+////////////////////////////////////////////////////////////
+bool window_impl_x11::is_minimized() const
+{
+	Atom wm_state_atom = get_atom("WM_STATE", false);
+	if(wm_state_atom == None)
+	{
+		return false;
+	}
+	Atom actual_type = None;
+	int actual_format = 0;
+	unsigned long nitems = 0;
+	unsigned long bytes_after = 0;
+	unsigned char* data = nullptr;
+	const int status =
+		XGetWindowProperty(display_, window_, wm_state_atom, 0, 2, False, AnyPropertyType, &actual_type,
+						   &actual_format, &nitems, &bytes_after, &data);
+	if(status != Success || data == nullptr || nitems == 0)
+	{
+		if(data != nullptr)
+		{
+			XFree(data);
+		}
+		return false;
+	}
+	const auto* states = reinterpret_cast<long*>(data);
+	const long state = states[0];
+	XFree(data);
+	// ICCCM: IconicState == 3 (see X11/Xutil.h)
+	return state == IconicState;
 }
 
 ////////////////////////////////////////////////////////////

@@ -129,7 +129,13 @@ public:
 
 	static auto get_current_video_driver() -> const char*
 	{
+#if defined(_WIN32)
+		return "win32";
+#elif defined(__linux__)
+		return "x11";
+#else
 		return "unknown";
+#endif
 	}
 
 	auto get_impl() const -> const ::mml::window&
@@ -153,7 +159,12 @@ public:
 
 	auto get_display_scale() const -> float
 	{
-		return 1.0f;
+		return impl_.get_display_scale();
+	}
+
+	auto get_content_scale() const -> float
+	{
+		return impl_.get_content_scale();
 	}
 
 	auto is_open() const noexcept -> bool
@@ -178,6 +189,17 @@ public:
 		result.w = static_cast<uint32_t>(size[0]);
 		result.h = static_cast<uint32_t>(size[1]);
 		return result;
+	}
+
+	auto get_frame_size() const noexcept -> frame_insets
+	{
+		frame_insets insets{};
+		auto f = impl_.get_frame_size();
+		insets.left = f[0];
+		insets.top = f[1];
+		insets.right = f[2];
+		insets.bottom = f[3];
+		return insets;
 	}
 
 	void set_maximum_size(const area&) noexcept
@@ -255,7 +277,7 @@ public:
 
     auto is_minimized() const noexcept -> bool
     {
-        return false;
+        return impl_.is_minimized();
     }
 
 	void set_border(bool /*b*/) noexcept

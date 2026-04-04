@@ -108,6 +108,8 @@ MML_WINDOW_API bool operator <=(const video_mode& left, const video_mode& right)
 ////////////////////////////////////////////////////////////
 MML_WINDOW_API bool operator >=(const video_mode& left, const video_mode& right);
 
+MML_WINDOW_API float get_display_content_scale(int display_index = 0);
+
 } // namespace mml
 
 

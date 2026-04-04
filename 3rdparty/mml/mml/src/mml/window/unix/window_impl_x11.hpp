@@ -91,6 +91,8 @@ public:
 	////////////////////////////////////////////////////////////
 	virtual void set_size(const std::array<std::uint32_t, 2>& size);
 
+	std::array<std::int32_t, 4> get_frame_size() const override;
+
 	////////////////////////////////////////////////////////////
 	/// \brief Change the title of the window
 	///
@@ -169,6 +171,7 @@ public:
 	////////////////////////////////////////////////////////////
 	virtual bool has_focus() const;
 
+	bool is_minimized() const override;
 protected:
 	////////////////////////////////////////////////////////////
 	/// \brief Process incoming events from the operating system

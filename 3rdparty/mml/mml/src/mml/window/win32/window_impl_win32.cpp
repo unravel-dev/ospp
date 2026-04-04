@@ -14,6 +14,7 @@
 #include <mml/window/window_style.hpp>
 #include <mml/system/err.hpp>
 #include <mml/system/utf.hpp>
+#include <algorithm>
 #include <vector>
 #include <cstring>
 #include <iterator>
@@ -194,11 +195,14 @@ cursor_grabbed_   (fullscreen_)
         
     }
 
-    // In windowed mode, adjust width and height so that window will have the requested client area
+    // In windowed mode, adjust width/height for the client area and convert (x, y) from client
+    // top-left in screen space to the outer rect origin expected by CreateWindowW (SDL/GLFW semantics).
     if (!fullscreen_)
     {
 		RECT rectangle = {0, 0, width, height};
         AdjustWindowRect(&rectangle, win32Style, false);
+        x += static_cast<int>(rectangle.left);
+        y += static_cast<int>(rectangle.top);
         width  = rectangle.right - rectangle.left;
         height = rectangle.bottom - rectangle.top;
     }
@@ -305,17 +309,41 @@ void window_impl_win32::process_events()
 ////////////////////////////////////////////////////////////
 std::array<std::int32_t, 2> window_impl_win32::get_position() const
 {
-    RECT rect;
-    GetWindowRect(handle_, &rect);
-
-	return std::array<std::int32_t, 2>({ rect.left, rect.top });
+    if(!handle_)
+    {
+        return {{0, 0}};
+    }
+    POINT client_origin{0, 0};
+    if(ClientToScreen(handle_, &client_origin) == 0)
+    {
+        return {{0, 0}};
+    }
+    return std::array<std::int32_t, 2>(
+        {static_cast<std::int32_t>(client_origin.x), static_cast<std::int32_t>(client_origin.y)});
 }
 
 
 ////////////////////////////////////////////////////////////
 void window_impl_win32::set_position(const std::array<std::int32_t, 2>& position)
 {
-    SetWindowPos(handle_, nullptr, position[0], position[1], 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+    if(!handle_)
+    {
+        return;
+    }
+    RECT window_rect{};
+    if(GetWindowRect(handle_, &window_rect) == 0)
+    {
+        return;
+    }
+    POINT client_origin{0, 0};
+    if(ClientToScreen(handle_, &client_origin) == 0)
+    {
+        return;
+    }
+    const int offset_x = static_cast<int>(client_origin.x - window_rect.left);
+    const int offset_y = static_cast<int>(client_origin.y - window_rect.top);
+    SetWindowPos(handle_, nullptr, static_cast<int>(position[0]) - offset_x,
+                 static_cast<int>(position[1]) - offset_y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 
     if(cursor_grabbed_)
         grab_cursor(true);
@@ -344,6 +372,34 @@ void window_impl_win32::set_size(const std::array<std::uint32_t, 2>& size)
     int height = rectangle.bottom - rectangle.top;
 
     SetWindowPos(handle_, nullptr, 0, 0, width, height, SWP_NOMOVE | SWP_NOZORDER);
+}
+
+
+////////////////////////////////////////////////////////////
+std::array<std::int32_t, 4> window_impl_win32::get_frame_size() const
+{
+    if(!handle_)
+    {
+        return {{0, 0, 0, 0}};
+    }
+    RECT window_rect{};
+    RECT client_rect{};
+    if(GetWindowRect(handle_, &window_rect) == 0 || GetClientRect(handle_, &client_rect) == 0)
+    {
+        return {{0, 0, 0, 0}};
+    }
+    POINT client_origin{0, 0};
+    if(ClientToScreen(handle_, &client_origin) == 0)
+    {
+        return {{0, 0, 0, 0}};
+    }
+    const LONG client_w = client_rect.right - client_rect.left;
+    const LONG client_h = client_rect.bottom - client_rect.top;
+    const std::int32_t left = static_cast<std::int32_t>(client_origin.x - window_rect.left);
+    const std::int32_t top = static_cast<std::int32_t>(client_origin.y - window_rect.top);
+    const std::int32_t right = static_cast<std::int32_t>(window_rect.right - (client_origin.x + client_w));
+    const std::int32_t bottom = static_cast<std::int32_t>(window_rect.bottom - (client_origin.y + client_h));
+    return {{left, top, right, bottom}};
 }
 
 
@@ -414,6 +470,42 @@ void window_impl_win32::minimize()
 void window_impl_win32::restore()
 {
 	ShowWindow(handle_, SW_RESTORE);
+}
+
+////////////////////////////////////////////////////////////
+bool window_impl_win32::is_minimized() const
+{
+	return handle_ != nullptr && IsIconic(handle_) != FALSE;
+}
+
+////////////////////////////////////////////////////////////
+float window_impl_win32::get_content_scale() const
+{
+	if(!handle_)
+	{
+		return 1.f;
+	}
+	using GetDpiForWindowFn = UINT(WINAPI*)(HWND);
+	static auto get_dpi_for_window = reinterpret_cast<GetDpiForWindowFn>(
+		GetProcAddress(GetModuleHandleW(L"user32.dll"), "GetDpiForWindow"));
+	if(get_dpi_for_window)
+	{
+		const UINT dpi = get_dpi_for_window(handle_);
+		if(dpi > 0)
+		{
+			return static_cast<float>(dpi) / 96.f;
+		}
+	}
+	HDC hdc = GetDC(handle_);
+	if(!hdc)
+	{
+		return 1.f;
+	}
+	const int dpi_x = GetDeviceCaps(hdc, LOGPIXELSX);
+	const int dpi_y = GetDeviceCaps(hdc, LOGPIXELSY);
+	ReleaseDC(handle_, hdc);
+	const int dpi = std::max(dpi_x > 0 ? dpi_x : 96, dpi_y > 0 ? dpi_y : 96);
+	return static_cast<float>(dpi) / 96.f;
 }
 
 ////////////////////////////////////////////////////////////

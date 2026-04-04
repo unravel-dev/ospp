@@ -373,6 +373,12 @@ video_bounds video_mode_impl::get_display_usable_bounds(int index)
 	return get_display_bounds(index);
 }
 
+////////////////////////////////////////////////////////////
+float video_mode_impl::get_display_content_scale(int /*index*/)
+{
+	return 1.f;
+}
+
 } // namespace priv
 
 } // namespace mml

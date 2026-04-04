@@ -203,6 +203,11 @@ public:
 		return SDL_GetWindowDisplayScale(impl_.get());
 	}
 
+	auto get_content_scale() const -> float
+	{
+		return get_display_scale();
+	}
+
 	auto is_open() const noexcept -> bool
 	{
 		return impl_ != nullptr;
@@ -227,6 +232,24 @@ public:
 		result.w = static_cast<uint32_t>(w);
 		result.h = static_cast<uint32_t>(h);
 		return result;
+	}
+
+	auto get_frame_size() const noexcept -> frame_insets
+	{
+		frame_insets insets{};
+		int top{};
+		int left{};
+		int bottom{};
+		int right{};
+		if(!SDL_GetWindowBordersSize(impl_.get(), &top, &left, &bottom, &right))
+		{
+			return insets;
+		}
+		insets.left = left;
+		insets.top = top;
+		insets.bottom = bottom;
+		insets.right = right;
+		return insets;
 	}
 
 	void set_maximum_size(const area& size) noexcept

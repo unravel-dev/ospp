@@ -49,6 +49,11 @@ auto window::get_display_scale() const -> float
 	return this_impl->get_display_scale();
 }
 
+auto window::get_content_scale() const -> float
+{
+	return this_impl->get_content_scale();
+}
+
 auto window::is_open() const noexcept -> bool
 {
 	return impl_ != nullptr;
@@ -72,6 +77,11 @@ void window::set_size(const area& size) noexcept
 auto window::get_size() const noexcept -> area
 {
 	return this_impl->get_size();
+}
+
+auto window::get_frame_size() const noexcept -> frame_insets
+{
+	return this_impl->get_frame_size();
 }
 
 void window::set_maximum_size(uint32_t width, uint32_t height) noexcept

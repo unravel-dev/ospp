@@ -62,6 +62,34 @@ window_impl::~window_impl() = default;
 
 
 ////////////////////////////////////////////////////////////
+std::array<std::int32_t, 4> window_impl::get_frame_size() const
+{
+    return {{0, 0, 0, 0}};
+}
+
+
+////////////////////////////////////////////////////////////
+bool window_impl::is_minimized() const
+{
+    return false;
+}
+
+
+////////////////////////////////////////////////////////////
+float window_impl::get_display_scale() const
+{
+    return get_content_scale();
+}
+
+
+////////////////////////////////////////////////////////////
+float window_impl::get_content_scale() const
+{
+    return 1.f;
+}
+
+
+////////////////////////////////////////////////////////////
 void window_impl::set_joystick_threshold(float threshold)
 {
     joystick_threshold_ = threshold;

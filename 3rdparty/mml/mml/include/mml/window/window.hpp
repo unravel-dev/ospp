@@ -253,6 +253,15 @@ public:
     void set_size(const std::array<std::uint32_t, 2>& size);
 
     ////////////////////////////////////////////////////////////
+    /// \brief Get OS decoration sizes around the client area
+    ///
+    /// Returns left, top, right, bottom in pixels. Top includes the title bar.
+    /// All zeros if unsupported (e.g. undecorated) or if there is no window.
+    ///
+    ////////////////////////////////////////////////////////////
+    std::array<std::int32_t, 4> get_frame_size() const;
+
+    ////////////////////////////////////////////////////////////
     /// \brief Change the title of the window
     ///
     /// \param title New title
@@ -408,6 +417,11 @@ public:
     ///
     ////////////////////////////////////////////////////////////
     bool has_focus() const;
+
+    bool is_minimized() const;
+    float get_display_scale() const;
+    /// Per-window DPI scale (GLFW-style: max axis / 96 on Win32). 1 if unknown.
+    float get_content_scale() const;
 
     ////////////////////////////////////////////////////////////
     /// \brief Get the OS-specific handle of the window

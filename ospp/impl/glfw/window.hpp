@@ -53,78 +53,78 @@ inline auto get_native_display_handle() noexcept -> native_display
 	return nullptr;
 #endif
 }
-inline bool glfwSetWindowCenter(GLFWwindow* window)
+/// Picks monitor work area like glfwSetWindowCenter, then sets position. Supports per-axis
+/// os::window::centered like SDL's SDL_WINDOWPOS_CENTERED.
+inline bool glfwApplyWindowPosition(GLFWwindow* window, int32_t x, int32_t y)
 {
 	if(!window)
+	{
 		return false;
-
-	int sx = 0, sy = 0;
-	int px = 0, py = 0;
-	int mx = 0, my = 0;
-	int monitor_count = 0;
-	int best_area = 0;
-	int final_x = 0, final_y = 0;
-
+	}
+	int sx = 0;
+	int sy = 0;
+	int px = 0;
+	int py = 0;
 	glfwGetWindowSize(window, &sx, &sy);
 	glfwGetWindowPos(window, &px, &py);
-
-	// Iterate throug all monitors
+	int monitor_count = 0;
 	GLFWmonitor** m = glfwGetMonitors(&monitor_count);
-	if(!m)
-		return false;
-
-	for(int j = 0; j < monitor_count; ++j)
+	int best_area = 0;
+	int chosen_mx = 0;
+	int chosen_my = 0;
+	int chosen_mw = 0;
+	int chosen_mh = 0;
+	if(m && monitor_count > 0)
 	{
-
-		glfwGetMonitorPos(m[j], &mx, &my);
-		const GLFWvidmode* mode = glfwGetVideoMode(m[j]);
-		if(!mode)
-			continue;
-
-		// Get intersection of two rectangles - screen and window
-		int minX = std::max(mx, px);
-		int minY = std::max(my, py);
-
-		int maxX = std::min(mx + mode->width, px + sx);
-		int maxY = std::min(my + mode->height, py + sy);
-
-		// Calculate area of the intersection
-		int area = std::max(maxX - minX, 0) * std::max(maxY - minY, 0);
-
-		// If its bigger than actual (window covers more space on this monitor)
-		if(area > best_area)
+		for(int j = 0; j < monitor_count; ++j)
 		{
-			// Calculate proper position in this monitor
-			final_x = mx + (mode->width - sx) / 2;
-			final_y = my + (mode->height - sy) / 2;
-
-			best_area = area;
+			int mx = 0, my = 0;
+			glfwGetMonitorPos(m[j], &mx, &my);
+			const GLFWvidmode* mode = glfwGetVideoMode(m[j]);
+			if(!mode)
+			{
+				continue;
+			}
+			const int minX = std::max(mx, px);
+			const int minY = std::max(my, py);
+			const int maxX = std::min(mx + mode->width, px + sx);
+			const int maxY = std::min(my + mode->height, py + sy);
+			const int area = std::max(maxX - minX, 0) * std::max(maxY - minY, 0);
+			if(area > best_area)
+			{
+				best_area = area;
+				chosen_mx = mx;
+				chosen_my = my;
+				chosen_mw = mode->width;
+				chosen_mh = mode->height;
+			}
 		}
 	}
-
-	// We found something
-	if(best_area)
-		glfwSetWindowPos(window, final_x, final_y);
-
-	// Something is wrong - current window has NOT any intersection with any monitors. Move it to the default
-	// one.
-	else
+	if(!best_area)
 	{
 		GLFWmonitor* primary = glfwGetPrimaryMonitor();
-		if(primary)
+		if(!primary)
 		{
-			const GLFWvidmode* desktop = glfwGetVideoMode(primary);
-
-			if(desktop)
-				glfwSetWindowPos(window, (desktop->width - sx) / 2, (desktop->height - sy) / 2);
-			else
-				return false;
-		}
-		else
 			return false;
+		}
+		const GLFWvidmode* desktop = glfwGetVideoMode(primary);
+		if(!desktop)
+		{
+			return false;
+		}
+		glfwGetMonitorPos(primary, &chosen_mx, &chosen_my);
+		chosen_mw = desktop->width;
+		chosen_mh = desktop->height;
 	}
-
+	const int final_x = (x == window::centered) ? (chosen_mx + (chosen_mw - sx) / 2) : static_cast<int>(x);
+	const int final_y = (y == window::centered) ? (chosen_my + (chosen_mh - sy) / 2) : static_cast<int>(y);
+	glfwSetWindowPos(window, final_x, final_y);
 	return true;
+}
+
+inline bool glfwSetWindowCenter(GLFWwindow* window)
+{
+	return glfwApplyWindowPosition(window, window::centered, window::centered);
 }
 
 inline auto create_impl(const std::string& title, uint32_t width, uint32_t height, uint32_t flags)
@@ -287,6 +287,11 @@ public:
 
 	auto get_display_scale() const -> float
 	{
+		return get_content_scale();
+	}
+
+	auto get_content_scale() const -> float
+	{
 		float xscale = 1.0f;
 		float yscale = 1.0f;
 		glfwGetWindowContentScale(impl_.get(), &xscale, &yscale);
@@ -319,6 +324,21 @@ public:
 		return result;
 	}
 
+	auto get_frame_size() const noexcept -> frame_insets
+	{
+		frame_insets insets{};
+		int left{};
+		int top{};
+		int right{};
+		int bottom{};
+		glfwGetWindowFrameSize(impl_.get(), &left, &top, &right, &bottom);
+		insets.left = left;
+		insets.top = top;
+		insets.right = right;
+		insets.bottom = bottom;
+		return insets;
+	}
+
 	void set_maximum_size(const area& size) noexcept
 	{
 		max_size_ = size;
@@ -345,17 +365,10 @@ public:
 
 	void set_position(const point& pos) noexcept
 	{
-		if(pos.x == window::centered && pos.y == window::centered)
-		{
-			glfwSetWindowCenter(impl_.get());
-		}
-		else
-		{
-			glfwSetWindowPos(impl_.get(), static_cast<int>(pos.x), static_cast<int>(pos.y));
-		}
+		glfwApplyWindowPosition(impl_.get(), pos.x, pos.y);
 	}
 
-	auto get_position() noexcept -> point
+	auto get_position() const noexcept -> point
 	{
 		point result;
 		int x{};
@@ -404,7 +417,8 @@ public:
 
 	void raise() noexcept
 	{
-        glfwRequestWindowAttention(impl_.get());
+		// SDL raise / request_focus both use SDL_RaiseWindow; match that with focus.
+		glfwFocusWindow(impl_.get());
 	}
 
     auto is_minimized() const noexcept -> bool

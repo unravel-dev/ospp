@@ -87,6 +87,8 @@ public:
     ////////////////////////////////////////////////////////////
     void set_size(const std::array<std::uint32_t, 2>& size) final;
 
+    std::array<std::int32_t, 4> get_frame_size() const final;
+
     ////////////////////////////////////////////////////////////
     /// \brief Change the title of the window
     ///
@@ -164,6 +166,9 @@ public:
     ///
     ////////////////////////////////////////////////////////////
     bool has_focus() const final;
+
+    bool is_minimized() const final;
+    float get_content_scale() const final;
 
 protected:
 

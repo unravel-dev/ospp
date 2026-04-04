@@ -23,6 +23,8 @@ public:
     static video_mode get_desktop_mode(int index = 0);
     static video_bounds get_display_bounds(int index = 0);
 	static video_bounds get_display_usable_bounds(int index = 0);
+    /// GLFW-style scale for the display (effective DPI / 96 on Win32). 1 if unknown.
+    static float get_display_content_scale(int index = 0);
 
 };
 

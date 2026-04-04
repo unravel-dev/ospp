@@ -111,6 +111,64 @@ video_bounds get_display_bounds_impl(int index, bool usable)
 	return bounds;
 }
 
+namespace
+{
+HMONITOR get_hmonitor_for_display_index(int index)
+{
+	int disp_count = 0;
+	DISPLAY_DEVICE adapter;
+	for(DWORD adapter_index = 0;; adapter_index++)
+	{
+		ZeroMemory(&adapter, sizeof(adapter));
+		adapter.cb = sizeof(adapter);
+		if(!EnumDisplayDevices(nullptr, adapter_index, &adapter, 0))
+			break;
+		if(!(adapter.StateFlags & DISPLAY_DEVICE_ACTIVE))
+			continue;
+		DWORD display_index = 0;
+		for(;; display_index++)
+		{
+			DISPLAY_DEVICE display;
+			ZeroMemory(&display, sizeof(display));
+			display.cb = sizeof(display);
+			if(!EnumDisplayDevices(adapter.DeviceName, display_index, &display, 0))
+				break;
+			if(!(display.StateFlags & DISPLAY_DEVICE_ACTIVE))
+				continue;
+			if(index == disp_count)
+			{
+				DEVMODE win32Mode;
+				win32Mode.dmSize = sizeof(win32Mode);
+				win32Mode.dmDriverExtra = 0;
+				if(!EnumDisplaySettings(adapter.DeviceName, ENUM_CURRENT_SETTINGS, &win32Mode))
+				{
+					return nullptr;
+				}
+				RECT rect;
+				rect.left = win32Mode.dmPosition.x;
+				rect.top = win32Mode.dmPosition.y;
+				rect.right = win32Mode.dmPosition.x + win32Mode.dmPelsWidth;
+				rect.bottom = win32Mode.dmPosition.y + win32Mode.dmPelsHeight;
+				monitor_data monitor;
+				wcscpy_s(monitor.adapterName, adapter.DeviceName);
+				EnumDisplayMonitors(nullptr, &rect, callback, (LPARAM)&monitor);
+				HMONITOR hm = monitor.handle;
+				if(!hm)
+				{
+					POINT pt;
+					pt.x = (rect.left + rect.right) / 2;
+					pt.y = (rect.top + rect.bottom) / 2;
+					hm = MonitorFromPoint(pt, MONITOR_DEFAULTTOPRIMARY);
+				}
+				return hm;
+			}
+			disp_count++;
+		}
+	}
+	return nullptr;
+}
+} // namespace
+
 int video_mode_impl::get_number_of_displays()
 {
     int disp_count{};
@@ -312,6 +370,33 @@ video_bounds video_mode_impl::get_display_bounds(int index)
 video_bounds video_mode_impl::get_display_usable_bounds(int index)
 {
 	return get_display_bounds_impl(index, true);
+}
+
+////////////////////////////////////////////////////////////
+float video_mode_impl::get_display_content_scale(int index)
+{
+	HMONITOR mon = get_hmonitor_for_display_index(index);
+	if(!mon)
+	{
+		return 1.f;
+	}
+	using GetDpiForMonitorFn = HRESULT(WINAPI*)(HMONITOR, int, UINT*, UINT*);
+	static auto get_dpi_for_monitor = reinterpret_cast<GetDpiForMonitorFn>(
+		GetProcAddress(GetModuleHandleW(L"Shcore.dll"), "GetDpiForMonitor"));
+	if(!get_dpi_for_monitor)
+	{
+		return 1.f;
+	}
+	UINT dpi_x = 0;
+	UINT dpi_y = 0;
+	// MDT_EFFECTIVE_DPI == 0 (shellscalingapi.h)
+	const HRESULT hr = get_dpi_for_monitor(mon, 0, &dpi_x, &dpi_y);
+	if(FAILED(hr) || dpi_x == 0 || dpi_y == 0)
+	{
+		return 1.f;
+	}
+	const UINT dpi = (std::max)(dpi_x, dpi_y);
+	return static_cast<float>(dpi) / 96.f;
 }
 
 } // namespace priv
