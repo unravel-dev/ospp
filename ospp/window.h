@@ -83,6 +83,7 @@ public:
 	void restore() noexcept;
 	void raise() noexcept;
     auto is_minimized() const noexcept -> bool;
+    auto is_maximized() const noexcept -> bool;
 
 	void set_border(bool b = true) noexcept;
 	void set_fullscreen(bool b = true);

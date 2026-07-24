@@ -159,6 +159,11 @@ namespace os
         return false;
     }
 
+    auto window::is_maximized() const noexcept -> bool
+    {
+        return (this_impl->flags & window::maximized) != 0;
+    }
+
     void window::raise() noexcept
     {
     }

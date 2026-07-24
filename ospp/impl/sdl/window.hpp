@@ -346,6 +346,11 @@ public:
 		return (SDL_GetWindowFlags(impl_.get()) & SDL_WINDOW_MINIMIZED) != 0;
 	}
 
+	auto is_maximized() const noexcept -> bool
+	{
+		return (SDL_GetWindowFlags(impl_.get()) & SDL_WINDOW_MAXIMIZED) != 0;
+	}
+
 	void set_border(bool b) noexcept
 	{
 		if(!SDL_SetWindowBordered(impl_.get(), b))

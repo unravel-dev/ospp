@@ -280,6 +280,11 @@ public:
         return impl_.is_minimized();
     }
 
+    auto is_maximized() const noexcept -> bool
+    {
+        return false;
+    }
+
 	void set_border(bool /*b*/) noexcept
 	{
 		// these will invalidate the native_handle

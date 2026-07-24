@@ -426,6 +426,11 @@ public:
 		return glfwGetWindowAttrib(impl_.get(), GLFW_ICONIFIED) != 0;
     }
 
+	auto is_maximized() const noexcept -> bool
+	{
+		return glfwGetWindowAttrib(impl_.get(), GLFW_MAXIMIZED) != 0;
+	}
+
 	void set_border(bool) noexcept
 	{
 	}
