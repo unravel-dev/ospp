@@ -47,6 +47,10 @@ inline auto get_native_window_handle(SDL_Window* window) noexcept -> native_hand
 #elif defined(SDL_PLATFORM_IOS)
 	SDL_PropertiesID props = SDL_GetWindowProperties(window);
 	return SDL_GetPointerProperty(props, SDL_PROP_WINDOW_UIKIT_WINDOW_POINTER, NULL);
+#elif defined(SDL_PLATFORM_ANDROID)
+	// The ANativeWindow of SDL's surface; it is replaced when the surface is recreated.
+	return SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_ANDROID_WINDOW_POINTER,
+								  NULL);
 #else
 	return nullptr;
 #endif
@@ -171,7 +175,13 @@ public:
 			OS_SDL_ERROR_HANDLER_VOID();
 		}
 
-		SDL_StartTextInput(impl_.get());
+		// Text events arrive only while text input is on. Without an on-screen keyboard it is invisible
+		// and stays on; with one it would open the keyboard, so the application turns it on when a text
+		// field needs it (os::start_text_input).
+		if(!SDL_HasScreenKeyboardSupport())
+		{
+			SDL_StartTextInput(impl_.get());
+		}
 	}
 
 	static auto get_current_video_driver() -> const char*
