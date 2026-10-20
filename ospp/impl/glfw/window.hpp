@@ -339,6 +339,12 @@ public:
 		return insets;
 	}
 
+	/// GLFW runs on desktops only, where nothing covers a window's client area.
+	auto get_safe_area_insets() const noexcept -> frame_insets
+	{
+		return {};
+	}
+
 	void set_maximum_size(const area& size) noexcept
 	{
 		max_size_ = size;

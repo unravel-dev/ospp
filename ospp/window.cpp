@@ -84,6 +84,11 @@ auto window::get_frame_size() const noexcept -> frame_insets
 	return this_impl->get_frame_size();
 }
 
+auto window::get_safe_area_insets() const noexcept -> frame_insets
+{
+	return this_impl->get_safe_area_insets();
+}
+
 void window::set_maximum_size(uint32_t width, uint32_t height) noexcept
 {
 	set_maximum_size(area{width, height});

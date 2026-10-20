@@ -324,6 +324,11 @@ inline void pump_events() noexcept
 		}
 	}
 }
+
+/// GLFW reports no application lifecycle events.
+inline void set_app_event_callback(app_event_callback /*callback*/)
+{
+}
 } // namespace glfw
 } // namespace detail
 } // namespace os

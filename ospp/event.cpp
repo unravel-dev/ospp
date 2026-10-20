@@ -47,6 +47,16 @@ auto poll_event(event& e) noexcept -> bool
 	return pop_event(e);
 }
 
+void pump_events() noexcept
+{
+	impl::pump_events();
+}
+
+void set_app_event_callback(app_event_callback callback)
+{
+	impl::set_app_event_callback(std::move(callback));
+}
+
 void push_event(const event& e)
 {
 	get_event_queue().emplace_back(e);

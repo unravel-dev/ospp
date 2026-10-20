@@ -2,6 +2,7 @@
 
 #include "../../window.h"
 
+#include "android_window.hpp"
 #include "cursor.hpp"
 #include "error.hpp"
 
@@ -48,9 +49,9 @@ inline auto get_native_window_handle(SDL_Window* window) noexcept -> native_hand
 	SDL_PropertiesID props = SDL_GetWindowProperties(window);
 	return SDL_GetPointerProperty(props, SDL_PROP_WINDOW_UIKIT_WINDOW_POINTER, NULL);
 #elif defined(SDL_PLATFORM_ANDROID)
-	// The ANativeWindow of SDL's surface; it is replaced when the surface is recreated.
-	return SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_ANDROID_WINDOW_POINTER,
-								  NULL);
+	// The ANativeWindow of SDL's surface; a new one replaces it when the application returns from
+	// the background.
+	return get_android_window(window);
 #else
 	return nullptr;
 #endif
@@ -259,6 +260,23 @@ public:
 		insets.top = top;
 		insets.bottom = bottom;
 		insets.right = right;
+		return insets;
+	}
+
+	auto get_safe_area_insets() const noexcept -> frame_insets
+	{
+		frame_insets insets{};
+		SDL_Rect safe{};
+		int width{};
+		int height{};
+		if(!SDL_GetWindowSafeArea(impl_.get(), &safe) || !SDL_GetWindowSize(impl_.get(), &width, &height))
+		{
+			return insets;
+		}
+		insets.left = safe.x;
+		insets.top = safe.y;
+		insets.right = width - (safe.x + safe.w);
+		insets.bottom = height - (safe.y + safe.h);
 		return insets;
 	}
 

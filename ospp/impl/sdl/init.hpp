@@ -1,5 +1,6 @@
 #pragma once
 
+#include "app_events.hpp"
 #include "error.hpp"
 
 namespace os
@@ -10,6 +11,7 @@ namespace sdl
 {
 inline void shutdown() noexcept
 {
+	SDL_RemoveEventWatch(watch_app_events, nullptr);
 	SDL_Quit();
 }
 
@@ -24,6 +26,7 @@ inline auto init() -> bool
 		OS_SDL_ERROR_HANDLER(result);
 		return false;
 	}
+	SDL_AddEventWatch(watch_app_events, nullptr);
 
 	return true;
 }

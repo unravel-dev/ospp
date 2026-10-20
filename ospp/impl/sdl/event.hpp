@@ -2,6 +2,7 @@
 
 #include "../../event.h"
 
+#include "app_events.hpp"
 #include "keyboard.hpp"
 #include "mouse.hpp"
 
@@ -49,6 +50,18 @@ inline auto to_window_event_id(uint32_t id) -> window_event_id
 	}
 
 	return window_event_id::none;
+}
+
+inline void fill_finger_event(event& ev, const SDL_Event& e)
+{
+	ev.finger.touch_id = e.tfinger.touchID;
+	ev.finger.finger_id = e.tfinger.fingerID;
+	ev.finger.window_id = e.tfinger.windowID;
+	ev.finger.x = e.tfinger.x;
+	ev.finger.y = e.tfinger.y;
+	ev.finger.dx = e.tfinger.dx;
+	ev.finger.dy = e.tfinger.dy;
+	ev.finger.pressure = e.tfinger.pressure;
 }
 
 void fill_drop_event(event& ev, const SDL_Event& e)
@@ -141,6 +154,7 @@ inline auto to_event(const SDL_Event& e) -> event
 			ev.button.y = int32_t(e.button.y);
 			ev.button.raw_x = int32_t(e.button.x);
 			ev.button.raw_y = int32_t(e.button.y);
+			ev.button.is_from_touch = e.button.which == SDL_TOUCH_MOUSEID;
 			break;
 		case SDL_EVENT_MOUSE_BUTTON_UP:
 			ev.type = events::mouse_button;
@@ -151,6 +165,7 @@ inline auto to_event(const SDL_Event& e) -> event
 			ev.button.y = int32_t(e.button.y);
 			ev.button.raw_x = int32_t(e.button.x);
 			ev.button.raw_y = int32_t(e.button.y);
+			ev.button.is_from_touch = e.button.which == SDL_TOUCH_MOUSEID;
 			break;
 		case SDL_EVENT_MOUSE_MOTION:
 			ev.type = events::mouse_motion;
@@ -171,6 +186,7 @@ inline auto to_event(const SDL_Event& e) -> event
 
 			ev.motion.raw_x = int32_t(ev.motion.x);
 			ev.motion.raw_y = int32_t(ev.motion.y);
+			ev.motion.is_from_touch = e.motion.which == SDL_TOUCH_MOUSEID;
 
 			break;
 		case SDL_EVENT_MOUSE_WHEEL:
@@ -182,12 +198,19 @@ inline auto to_event(const SDL_Event& e) -> event
 			break;
 		case SDL_EVENT_FINGER_DOWN:
 			ev.type = events::finger_down;
+			fill_finger_event(ev, e);
 			break;
 		case SDL_EVENT_FINGER_UP:
 			ev.type = events::finger_up;
+			fill_finger_event(ev, e);
 			break;
 		case SDL_EVENT_FINGER_MOTION:
 			ev.type = events::finger_motion;
+			fill_finger_event(ev, e);
+			break;
+		case SDL_EVENT_FINGER_CANCELED:
+			ev.type = events::finger_canceled;
+			fill_finger_event(ev, e);
 			break;
 		case SDL_EVENT_CLIPBOARD_UPDATE:
 			ev.type = events::clipboard_update;

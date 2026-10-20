@@ -190,6 +190,11 @@ inline void pump_events() noexcept
 		}
 	}
 }
+
+/// MML reports no application lifecycle events.
+inline void set_app_event_callback(app_event_callback /*callback*/)
+{
+}
 } // namespace mml
 } // namespace detail
 } // namespace os

@@ -3,13 +3,11 @@
 #include "keyboard.h"
 #include "mouse.h"
 #include <cstdint>
+#include <functional>
 #include <string>
 
 namespace os
 {
-// using finger = SDL_Finger;
-// using touch_finger_event = SDL_TouchFingerEvent;
-
 enum class window_event_id : uint8_t
 {
 	none = 0,
@@ -54,6 +52,9 @@ enum class events : uint8_t
 	finger_down,
 	finger_up,
 	finger_motion,
+	/// The finger left without a release the application should act on (the system took the
+	/// gesture, or the window lost it).
+	finger_canceled,
 
 	clipboard_update,
 	drop_file,
@@ -118,6 +119,7 @@ struct mouse_button_event
 	int32_t raw_y{};		/**< Y coordinate, raw */
 	mouse::button button{}; /**< The mouse button index */
 	state state_id{};		/**< ::pressed or ::released */
+	bool is_from_touch{};	/**< Made by the platform from a finger, which also reports finger events */
 };
 
 struct mouse_motion_event
@@ -127,6 +129,20 @@ struct mouse_motion_event
 	int32_t y{};	 /**< Y coordinate, relative to window */
 	int32_t raw_x{}; /**< X coordinate, raw */
 	int32_t raw_y{}; /**< Y coordinate, raw */
+	bool is_from_touch{}; /**< Made by the platform from a finger, which also reports finger events */
+};
+
+/// A finger on a touch device: finger_down, finger_up, finger_motion and finger_canceled.
+struct touch_finger_event
+{
+	uint64_t touch_id{};  /**< The touch device */
+	uint64_t finger_id{}; /**< The finger; unique on its device while it touches */
+	uint32_t window_id{}; /**< The window under the finger */
+	float x{};			  /**< X coordinate, relative to the window, normalized to 0...1 */
+	float y{};			  /**< Y coordinate, relative to the window, normalized to 0...1 */
+	float dx{};			  /**< X motion since the last event, normalized to -1...1 */
+	float dy{};			  /**< Y motion since the last event, normalized to -1...1 */
+	float pressure{};	  /**< Normalized to 0...1 */
 };
 
 struct mouse_wheel_event
@@ -172,6 +188,7 @@ struct event
 		window_event window;
 		key_event key;
 		mouse_motion_event motion;
+		touch_finger_event finger;
 		quit_event quit;
 		display_event display;
 		joystick_device_event joystick_device;
@@ -184,4 +201,19 @@ void push_event(event&& e);
 void push_event(const event& e);
 
 auto poll_event(event& e) noexcept -> bool;
+
+/// Moves the platform's pending events into the queue that poll_event reads, without taking any.
+/// On Android it blocks while the application is in the background.
+void pump_events() noexcept;
+
+/// Receives the application lifecycle events: app_terminating, app_low_memory and the
+/// app_*_background and app_*_foreground events.
+using app_event_callback = std::function<void(events)>;
+
+/// Sets the function that receives application lifecycle events as soon as the platform reports
+/// them, on the thread that pumps events and before poll_event returns them. On Android the event
+/// pump blocks right after app_did_enter_background until the application returns, so work that
+/// must happen before that (pausing audio, saving) belongs in this function. An empty function
+/// removes it. Desktop platforms report no lifecycle events.
+void set_app_event_callback(app_event_callback callback);
 } // namespace os

@@ -60,6 +60,10 @@ public:
 	/// Client-area border sizes in window coordinates (top includes title bar). May be zero if unknown.
 	auto get_frame_size() const noexcept -> frame_insets;
 
+	/// How far in from each edge of the client area content stays clear of display cutouts, rounded
+	/// corners and system bars, in window coordinates. Zero where nothing covers the window.
+	auto get_safe_area_insets() const noexcept -> frame_insets;
+
 	void set_maximum_size(uint32_t width, uint32_t height) noexcept;
 	void set_maximum_size(const area& size) noexcept;
 	auto get_maximum_size() const noexcept -> area;
