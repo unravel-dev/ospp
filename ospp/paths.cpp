@@ -23,5 +23,10 @@ auto get_preferences_path(const std::string& organization, const std::string& ap
 {
 	return impl::get_preferences_path(organization, application);
 }
+
+auto get_cache_path(const std::string& organization, const std::string& application) -> std::string
+{
+	return impl::get_cache_path(organization, application);
+}
 } // namespace paths
 } // namespace os

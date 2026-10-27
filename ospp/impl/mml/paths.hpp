@@ -15,6 +15,12 @@ inline auto get_preferences_path(const std::string&, const std::string&) -> std:
 {
 	return {};
 }
+
+// Nor of a cache folder.
+inline auto get_cache_path(const std::string&, const std::string&) -> std::string
+{
+	return {};
+}
 } // namespace mml
 } // namespace detail
 } // namespace paths
