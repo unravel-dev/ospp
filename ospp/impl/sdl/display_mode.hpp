@@ -3,6 +3,8 @@
 #include "../../display_mode.h"
 
 #include "error.hpp"
+#include <cmath>
+#include <string>
 #include <vector>
 
 namespace os
@@ -18,7 +20,8 @@ inline auto from_impl(const SDL_DisplayMode& mode) -> ::os::display::mode
 	::os::display::mode result;
 	result.w = static_cast<uint32_t>(mode.w);
 	result.h = static_cast<uint32_t>(mode.h);
-	result.refresh_rate = static_cast<uint32_t>(mode.refresh_rate);
+	// SDL reports 59.94 Hz and the like.
+	result.refresh_rate = static_cast<uint32_t>(std::lround(mode.refresh_rate));
 	result.bpp = SDL_BITSPERPIXEL(mode.format);
 	result.display_scale = mode.pixel_density;
 	return result;
@@ -145,6 +148,12 @@ inline auto get_content_scale(int index = 0) -> float
 {
 	auto display_id = to_display_id(index);
 	return SDL_GetDisplayContentScale(display_id);
+}
+
+inline auto get_display_name(int index = 0) -> std::string
+{
+	const char* name = SDL_GetDisplayName(to_display_id(index));
+	return name != nullptr ? name : std::string{};
 }
 
 } // namespace sdl

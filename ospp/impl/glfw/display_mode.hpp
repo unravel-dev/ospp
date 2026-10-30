@@ -152,6 +152,18 @@ inline auto get_content_scale(int index = 0) -> float
 	return std::max(xscale, yscale);
 }
 
+inline auto get_display_name(int index = 0) -> std::string
+{
+	int mointor_count{0};
+	auto monitors = glfwGetMonitors(&mointor_count);
+	if(index < 0 || index >= mointor_count)
+	{
+		return {};
+	}
+	const char* name = glfwGetMonitorName(monitors[index]);
+	return name != nullptr ? name : std::string{};
+}
+
 } // namespace glfw
 } // namespace detail
 } // namespace os

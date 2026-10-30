@@ -77,6 +77,11 @@ inline auto get_content_scale(int index = 0) -> float
 	return ::mml::get_display_content_scale(index);
 }
 
+inline auto get_display_name(int /*index*/ = 0) -> std::string
+{
+	return {};
+}
+
 } // namespace mml
 } // namespace detail
 } // namespace os

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cursor.h"
+#include "display_mode.h"
 #include "types.hpp"
 
 #include <cstdint>
@@ -91,6 +92,17 @@ public:
 
 	void set_border(bool b = true) noexcept;
 	void set_fullscreen(bool b = true);
+	auto is_fullscreen() const noexcept -> bool;
+
+	/// The display the window is on, as an index of os::display.
+	auto get_display_index() const noexcept -> int;
+
+	/// The mode a fullscreen window switches its display to (exclusive fullscreen): the display's mode
+	/// closest to \a mode. Returns false when the display has no fullscreen modes.
+	auto set_fullscreen_mode(int display_index, const display::mode& mode) -> bool;
+
+	/// A fullscreen window covers its display at the desktop's mode (borderless fullscreen), the default.
+	void clear_fullscreen_mode();
 
 	void set_opacity(float opacity);
 	auto get_opacity() const -> float;

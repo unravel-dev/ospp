@@ -443,7 +443,7 @@ public:
 
 	void set_fullscreen(bool b)
 	{
-		auto monitor = glfwGetPrimaryMonitor();
+		auto monitor = get_fullscreen_monitor();
 		auto mode = glfwGetVideoMode(monitor);
 		glfwWindowHint(GLFW_RED_BITS, mode->redBits);
 		glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
@@ -452,15 +452,79 @@ public:
 
 		if(b)
 		{
-			size_before_fullscreen_ = get_size();
-			pos_before_fullscreen_ = get_position();
-			glfwSetWindowMonitor(impl_.get(), monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+			if(!is_fullscreen())
+			{
+				size_before_fullscreen_ = get_size();
+				pos_before_fullscreen_ = get_position();
+			}
+			const bool has_mode = fullscreen_mode_.w > 0 && fullscreen_mode_.h > 0;
+			const int width = has_mode ? int(fullscreen_mode_.w) : mode->width;
+			const int height = has_mode ? int(fullscreen_mode_.h) : mode->height;
+			const int refresh_rate =
+				has_mode && fullscreen_mode_.refresh_rate > 0 ? int(fullscreen_mode_.refresh_rate) : mode->refreshRate;
+			glfwSetWindowMonitor(impl_.get(), monitor, 0, 0, width, height, refresh_rate);
 		}
 		else
 		{
 			glfwSetWindowMonitor(impl_.get(), nullptr, pos_before_fullscreen_.x, pos_before_fullscreen_.y,
 								 int(size_before_fullscreen_.w), int(size_before_fullscreen_.h),
 								 mode->refreshRate);
+		}
+	}
+
+	auto is_fullscreen() const noexcept -> bool
+	{
+		return glfwGetWindowMonitor(impl_.get()) != nullptr;
+	}
+
+	auto get_display_index() const noexcept -> int
+	{
+		int count{};
+		auto monitors = glfwGetMonitors(&count);
+		auto fullscreen_monitor = glfwGetWindowMonitor(impl_.get());
+		const auto position = get_position();
+		for(int i = 0; i < count; ++i)
+		{
+			if(monitors[i] == fullscreen_monitor)
+			{
+				return i;
+			}
+			int x{};
+			int y{};
+			int width{};
+			int height{};
+			glfwGetMonitorWorkarea(monitors[i], &x, &y, &width, &height);
+			if(position.x >= x && position.x < x + width && position.y >= y && position.y < y + height)
+			{
+				return i;
+			}
+		}
+		return 0;
+	}
+
+	auto set_fullscreen_mode(int display_index, const ::os::display::mode& mode) -> bool
+	{
+		int count{};
+		glfwGetMonitors(&count);
+		if(display_index < 0 || display_index >= count)
+		{
+			return false;
+		}
+		fullscreen_display_ = display_index;
+		fullscreen_mode_ = mode;
+		if(is_fullscreen())
+		{
+			set_fullscreen(true);
+		}
+		return true;
+	}
+
+	void clear_fullscreen_mode()
+	{
+		fullscreen_mode_ = {};
+		if(is_fullscreen())
+		{
+			set_fullscreen(true);
 		}
 	}
 
@@ -519,11 +583,23 @@ public:
 	}
 
 private:
+	/// The monitor of the exclusive mode, else the one the window is on.
+	auto get_fullscreen_monitor() const noexcept -> GLFWmonitor*
+	{
+		int count{};
+		auto monitors = glfwGetMonitors(&count);
+		const bool has_mode = fullscreen_mode_.w > 0 && fullscreen_mode_.h > 0;
+		const int index = has_mode ? fullscreen_display_ : get_display_index();
+		return index >= 0 && index < count ? monitors[index] : glfwGetPrimaryMonitor();
+	}
+
 	uint32_t id_{};
 	area min_size_{};
 	area max_size_{};
 	point pos_before_fullscreen_{};
 	area size_before_fullscreen_{};
+	int fullscreen_display_{};
+	::os::display::mode fullscreen_mode_{};
 	bool input_grabbed_{};
 
 	std::string title_{};

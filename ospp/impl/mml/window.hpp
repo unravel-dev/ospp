@@ -327,6 +327,26 @@ public:
 		//		}
 	}
 
+	auto is_fullscreen() const noexcept -> bool
+	{
+		return false;
+	}
+
+	auto get_display_index() const noexcept -> int
+	{
+		return 0;
+	}
+
+	// Fullscreen would recreate the window and invalidate the native handle (set_fullscreen).
+	auto set_fullscreen_mode(int /*display_index*/, const ::os::display::mode& /*mode*/) -> bool
+	{
+		return false;
+	}
+
+	void clear_fullscreen_mode()
+	{
+	}
+
 	void set_opacity(float opacity)
 	{
 		opacity_ = opacity;

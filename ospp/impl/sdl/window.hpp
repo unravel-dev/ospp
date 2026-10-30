@@ -4,6 +4,7 @@
 
 #include "android_window.hpp"
 #include "cursor.hpp"
+#include "display_mode.hpp"
 #include "error.hpp"
 
 #include <cstdint>
@@ -395,6 +396,36 @@ public:
 		}
 	}
 
+	auto is_fullscreen() const noexcept -> bool
+	{
+		return (SDL_GetWindowFlags(impl_.get()) & SDL_WINDOW_FULLSCREEN) != 0;
+	}
+
+	auto get_display_index() const noexcept -> int
+	{
+		return to_display_index(SDL_GetDisplayForWindow(impl_.get()));
+	}
+
+	auto set_fullscreen_mode(int display_index, const ::os::display::mode& mode) -> bool
+	{
+		SDL_DisplayMode closest{};
+		if(!SDL_GetClosestFullscreenDisplayMode(to_display_id(display_index),
+												static_cast<int>(mode.w),
+												static_cast<int>(mode.h),
+												static_cast<float>(mode.refresh_rate),
+												true,
+												&closest))
+		{
+			return false;
+		}
+		return SDL_SetWindowFullscreenMode(impl_.get(), &closest);
+	}
+
+	void clear_fullscreen_mode()
+	{
+		SDL_SetWindowFullscreenMode(impl_.get(), nullptr);
+	}
+
 	void set_opacity(float opacity)
 	{
 		if(!SDL_SetWindowOpacity(impl_.get(), opacity))
@@ -453,7 +484,7 @@ public:
 	void set_icon(const image& img)
 	{
 		auto surface =
-			SDL_CreateSurfaceFrom(int(img.size.w), int(img.size.h), SDL_PixelFormat::SDL_PIXELFORMAT_RGBA8888,
+			SDL_CreateSurfaceFrom(int(img.size.w), int(img.size.h), SDL_PixelFormat::SDL_PIXELFORMAT_RGBA32,
 								  (void*)img.pixels.data(), int(img.size.w * 4));
 		if(!surface)
 		{

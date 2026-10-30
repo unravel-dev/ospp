@@ -194,6 +194,26 @@ void window::set_fullscreen(bool b)
 	this_impl->set_fullscreen(b);
 }
 
+auto window::is_fullscreen() const noexcept -> bool
+{
+	return this_impl->is_fullscreen();
+}
+
+auto window::get_display_index() const noexcept -> int
+{
+	return this_impl->get_display_index();
+}
+
+auto window::set_fullscreen_mode(int display_index, const display::mode& mode) -> bool
+{
+	return this_impl->set_fullscreen_mode(display_index, mode);
+}
+
+void window::clear_fullscreen_mode()
+{
+	this_impl->clear_fullscreen_mode();
+}
+
 void window::set_opacity(float opacity)
 {
 	this_impl->set_opacity(opacity);
