@@ -54,17 +54,31 @@ inline auto to_impl(button b) -> uint8_t
 	}
 }
 
+/// The mouse's state. A page has no cursor outside it, and the browser reports a finger moving across it with
+/// pointer events only, which SDL's global state does not follow: there SDL's own state, which follows the mouse it
+/// makes from touches too, in the coordinates of the window, which is at the page's origin.
+inline auto get_state(float& x, float& y) noexcept -> SDL_MouseButtonFlags
+{
+#if defined(__EMSCRIPTEN__)
+	return SDL_GetMouseState(&x, &y);
+#else
+	return SDL_GetGlobalMouseState(&x, &y);
+#endif
+}
+
 inline auto is_button_pressed(button b) noexcept -> bool
 {
 	auto impl_button = to_impl(b);
-	return (SDL_GetGlobalMouseState(nullptr, nullptr) & SDL_BUTTON_MASK(impl_button)) != 0;
+	float x{};
+	float y{};
+	return (get_state(x, y) & SDL_BUTTON_MASK(impl_button)) != 0;
 }
 
 inline auto get_position() noexcept -> point
 {
 	float x{};
 	float y{};
-	SDL_GetGlobalMouseState(&x, &y);
+	get_state(x, y);
 	return {int32_t(x), int32_t(y)};
 }
 

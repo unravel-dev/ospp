@@ -324,6 +324,17 @@ public:
 		return result;
 	}
 
+	auto get_size_in_pixels() const noexcept -> area
+	{
+		area result{};
+		int w{};
+		int h{};
+		glfwGetFramebufferSize(impl_.get(), &w, &h);
+		result.w = static_cast<uint32_t>(w);
+		result.h = static_cast<uint32_t>(h);
+		return result;
+	}
+
 	auto get_frame_size() const noexcept -> frame_insets
 	{
 		frame_insets insets{};

@@ -79,6 +79,11 @@ auto window::get_size() const noexcept -> area
 	return this_impl->get_size();
 }
 
+auto window::get_size_in_pixels() const noexcept -> area
+{
+	return this_impl->get_size_in_pixels();
+}
+
 auto window::get_frame_size() const noexcept -> frame_insets
 {
 	return this_impl->get_frame_size();

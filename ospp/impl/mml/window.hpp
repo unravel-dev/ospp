@@ -191,6 +191,12 @@ public:
 		return result;
 	}
 
+	/// MML counts window sizes in pixels.
+	auto get_size_in_pixels() const noexcept -> area
+	{
+		return get_size();
+	}
+
 	auto get_frame_size() const noexcept -> frame_insets
 	{
 		frame_insets insets{};

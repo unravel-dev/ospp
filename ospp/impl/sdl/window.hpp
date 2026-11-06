@@ -53,6 +53,11 @@ inline auto get_native_window_handle(SDL_Window* window) noexcept -> native_hand
 	// The ANativeWindow of SDL's surface; a new one replaces it when the application returns from
 	// the background.
 	return get_android_window(window);
+#elif defined(SDL_PLATFORM_EMSCRIPTEN)
+	// The CSS selector of the window's canvas ("#canvas" unless the page or a hint names another), which a
+	// renderer in the browser draws to. SDL keeps the string as long as the window.
+	return const_cast<char*>(SDL_GetStringProperty(SDL_GetWindowProperties(window),
+												   SDL_PROP_WINDOW_EMSCRIPTEN_CANVAS_ID_STRING, NULL));
 #else
 	return nullptr;
 #endif
@@ -90,6 +95,10 @@ inline auto get_native_display_handle(SDL_Window* window) noexcept -> native_dis
 inline auto get_impl_flags(uint32_t flags) -> uint32_t
 {
 	uint32_t result = SDL_WINDOW_HIGH_PIXEL_DENSITY;
+#if defined(__EMSCRIPTEN__)
+	// In the browser the window is the page: its canvas fills the page and follows its size.
+	result |= SDL_WINDOW_FILL_DOCUMENT;
+#endif
 	if(flags & window::fullscreen)
 	{
 		result |= SDL_WINDOW_FULLSCREEN;
@@ -241,6 +250,17 @@ public:
 		int w{};
 		int h{};
 		SDL_GetWindowSize(impl_.get(), &w, &h);
+		result.w = static_cast<uint32_t>(w);
+		result.h = static_cast<uint32_t>(h);
+		return result;
+	}
+
+	auto get_size_in_pixels() const noexcept -> area
+	{
+		area result{};
+		int w{};
+		int h{};
+		SDL_GetWindowSizeInPixels(impl_.get(), &w, &h);
 		result.w = static_cast<uint32_t>(w);
 		result.h = static_cast<uint32_t>(h);
 		return result;

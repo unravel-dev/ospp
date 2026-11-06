@@ -8,6 +8,11 @@ file(GLOB libsrc "${CMAKE_CURRENT_SOURCE_DIR}/*.h"
                  "${CMAKE_CURRENT_SOURCE_DIR}/*.c"
                  "${CMAKE_CURRENT_SOURCE_DIR}/*.cc")
 
+# The browser entry for host runtimes that never call main; other platforms enter through main.h.
+if(NOT EMSCRIPTEN)
+	list(REMOVE_ITEM libsrc "${CMAKE_CURRENT_SOURCE_DIR}/main_web.cpp")
+endif()
+
 message( STATUS "--------------------------------" )
 if("${OSPP_BACKEND_TYPE}" STREQUAL "SDL")
     message( STATUS "SDL WINDOW backend selected." )

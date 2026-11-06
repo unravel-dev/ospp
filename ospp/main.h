@@ -9,7 +9,9 @@
  *  - main everywhere but Android;
  *  - wmain, WinMain and wWinMain on Windows (Unicode console and GUI subsystem builds);
  *  - SDL_main on Android, exported: SDL's Java activity loads the application's shared library
- *    and calls it by name on its own thread.
+ *    and calls it by name on its own thread;
+ *  - os_main_from_host in the browser, defined in the library (main_web.cpp), for a host runtime
+ *    that never calls main and starts the application by the library's name.
  */
 auto os_main(int argc, char* argv[]) -> int;
 

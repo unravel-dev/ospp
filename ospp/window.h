@@ -57,6 +57,10 @@ public:
 	void set_size(uint32_t width, uint32_t height) noexcept;
 	void set_size(const area& size) noexcept;
 	auto get_size() const noexcept -> area;
+	/// The size of the window's drawable area in pixels: get_size times the window's pixel density, which
+	/// is more than 1 on high-density displays where the platform counts window sizes in points, and in a
+	/// browser on such a display.
+	auto get_size_in_pixels() const noexcept -> area;
 
 	/// Client-area border sizes in window coordinates (top includes title bar). May be zero if unknown.
 	auto get_frame_size() const noexcept -> frame_insets;

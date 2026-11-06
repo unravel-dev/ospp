@@ -76,6 +76,11 @@ namespace os
         return this_impl->a;
     }
 
+    auto window::get_size_in_pixels() const noexcept -> area
+    {
+        return this_impl->a;
+    }
+
     auto window::get_frame_size() const noexcept -> frame_insets
     {
         return {};
