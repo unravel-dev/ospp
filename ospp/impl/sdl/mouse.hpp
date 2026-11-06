@@ -166,6 +166,27 @@ inline void disable(bool val) noexcept
 	SDL_SetWindowRelativeMouseMode(window, val);
 }
 
+inline void set_relative_mode(const window& relative_to, bool enabled) noexcept
+{
+	SDL_SetWindowRelativeMouseMode(to_win_impl(relative_to).get_impl(), enabled);
+}
+
+inline auto get_relative_motion() noexcept -> point
+{
+	// SDL reports fractions of a coordinate; the remainder carries into the next call.
+	static float carry_x{};
+	static float carry_y{};
+	float x{};
+	float y{};
+	SDL_GetRelativeMouseState(&x, &y);
+	carry_x += x;
+	carry_y += y;
+	const point motion{int32_t(carry_x), int32_t(carry_y)};
+	carry_x -= float(motion.x);
+	carry_y -= float(motion.y);
+	return motion;
+}
+
 
 } // namespace sdl
 } // namespace detail

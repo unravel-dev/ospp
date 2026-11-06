@@ -54,6 +54,16 @@ void disable(bool val)
 	impl::disable(val);
 }
 
+void set_relative_mode(const window& relative_to, bool enabled) noexcept
+{
+	impl::set_relative_mode(relative_to, enabled);
+}
+
+auto get_relative_motion() noexcept -> point
+{
+	return impl::get_relative_motion();
+}
+
 
 } // namespace mouse
 } // namespace os

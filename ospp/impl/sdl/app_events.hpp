@@ -33,6 +33,14 @@ inline auto to_app_event(uint32_t type) -> events
 			return events::app_will_enter_foreground;
 		case SDL_EVENT_DID_ENTER_FOREGROUND:
 			return events::app_did_enter_foreground;
+#if defined(__EMSCRIPTEN__)
+		// A page has no lifecycle of its own: hidden (another tab, the browser minimized, the tab closing) is the
+		// background, which the browser may end without another event, and its frames stop until it is shown.
+		case SDL_EVENT_WINDOW_HIDDEN:
+			return events::app_will_enter_background;
+		case SDL_EVENT_WINDOW_SHOWN:
+			return events::app_did_enter_foreground;
+#endif
 		default:
 			return events::unknown;
 	}

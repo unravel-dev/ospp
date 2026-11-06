@@ -111,6 +111,15 @@ inline void capture(bool enabled)
 
 }
 
+inline void set_relative_mode(const window& /*relative_to*/, bool /*enabled*/) noexcept
+{
+}
+
+inline auto get_relative_motion() noexcept -> point
+{
+	return {};
+}
+
 inline void disable(bool enabled)
 {
 	auto focused_win = os::detail::glfw::get_focused_win();
