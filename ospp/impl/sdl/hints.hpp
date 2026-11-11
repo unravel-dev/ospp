@@ -18,6 +18,7 @@ inline void set_hint(const std::string& hint, const std::string& value)
         {"HINT_MOUSE_FOCUS_CLICKTHROUGH", SDL_HINT_MOUSE_FOCUS_CLICKTHROUGH},
         {"HINT_MOUSE_AUTO_CAPTURE", SDL_HINT_MOUSE_AUTO_CAPTURE},
         {"HINT_BORDERLESS_WINDOWED_STYLE", "SDL_BORDERLESS_WINDOWED_STYLE"},
+        {"HINT_ANDROID_TRAP_BACK_BUTTON", SDL_HINT_ANDROID_TRAP_BACK_BUTTON},
     };
 
     auto it = hint_mapping.find(hint);
